@@ -1,6 +1,6 @@
 {
   "name": "expect-even-more-jest",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "expect-more-jest with even more stuff",
   "main": "index.js",
   "scripts": {
