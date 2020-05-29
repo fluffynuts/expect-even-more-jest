@@ -1,8 +1,12 @@
 {
   "name": "expect-even-more-jest",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "expect-more-jest with even more stuff",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*"
+  ],
   "scripts": {
     "test": "jest",
     "prebuild": "rimraf dist",
