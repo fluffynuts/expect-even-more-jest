@@ -1,0 +1,43 @@
+{
+  "name": "expect-even-more-jest",
+  "version": "0.0.1",
+  "description": "expect-more-jest with even more stuff",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "prebuild": "rimraf dist",
+    "build": "tsc",
+    "lint": "tslint **/*.ts",
+    "increment-package-version-beta": "cross-env VERSION_INCREMENT_STRATEGY=patch run-s \"zarro increment-package-json-version\"",
+    "prerelease-beta": "run-s build test",
+    "release-beta": "cross-env BETA=1 VERSION_INCREMENT_STRATEGY=patch run-s \"zarro release-npm\"",
+    "prerelease": "run-s build test",
+    "release": "cross-env VERSION_INCREMENT_STRATEGY=minor run-s \"zarro release-npm\"",
+    "zarro": "zarro"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/fluffynuts/expect-even-more-jest.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fluffynuts/expect-even-more-jest/issues"
+  },
+  "homepage": "https://github.com/fluffynuts/expect-even-more-jest#readme",
+  "devDependencies": {
+    "@types/jest": "^25.2.3",
+    "@types/lodash": "^4.14.153",
+    "@types/node": "^14.0.5",
+    "ts-jest": "^26.0.0",
+    "tslint": "^6.1.2",
+    "typescript": "^3.9.3",
+    "zarro": "^1.49.0"
+  },
+  "dependencies": {
+    "expect-more-jest": "^5.1.0",
+    "jest": "^26.0.1",
+    "lodash": "^4.17.15"
+  }
+}
