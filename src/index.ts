@@ -30,6 +30,32 @@ export function areEqual(
     return result;
 }
 
+export function isJasmineSpy(a: any) {
+    return a &&
+        a.calls &&
+        typeof a.calls.all === "function";
+}
+
+export function isJestMock(a: any) {
+    return a &&
+        a.mock &&
+        Array.isArray(a.mock.calls);
+}
+
+export function fetchArgs(subject: Mock | jasmine.Spy): any[] {
+    // jasmine spies come from doing `spyOn(thing, "method")`
+    // jest mocks come from `jest.fn()`
+    if (isJasmineSpy(subject)) {
+        const spy = subject as jasmine.Spy;
+        return spy.calls.all().map(c => c.args);
+    } else if (isJestMock(subject)) {
+        const mock = subject as Mock;
+        return mock.mock.calls;
+    } else {
+        throw new Error(`${subject} doesn't appear to be a jasmine spy or a jest mock?`);
+    }
+}
+
 declare global {
     namespace jest {
         interface Matchers<R> {
@@ -333,18 +359,7 @@ beforeAll(() => {
             return runAssertions(this, () => {
                 expect(actual).toHaveBeenCalled();
                 expect(actual).toHaveBeenCalledWith(...args);
-                let allArgs: any[];
-                // jasmine spies come from doing `spyOn(thing, "method")`
-                // jest mocks come from `jest.fn()`
-                if (isJasmineSpy(actual)) {
-                    const spy = actual as jasmine.Spy;
-                    allArgs = spy.calls.all().map(c => c.args);
-                } else if (isJestMock(actual)) {
-                    const mock = actual as Mock;
-                    allArgs = mock.mock.calls;
-                } else {
-                    throw new Error("actual doesn't appear to be a spy or a mock?");
-                }
+                const allArgs = fetchArgs(actual);
                 const matching = allArgs.filter(
                     a => {
                         try {
@@ -360,18 +375,6 @@ beforeAll(() => {
                 );
                 return () => `Expected${ notFor(this) }to have been called once with ${ args }`;
             });
-
-            function isJasmineSpy(a: any) {
-                return a &&
-                    a.calls &&
-                    typeof a.calls.all === "function";
-            }
-
-            function isJestMock(a: any) {
-                return a &&
-                    a.mock &&
-                    Array.isArray(a.mock.calls);
-            }
         },
         async toBeCompleted(actual: Promise<any>) {
             return runAssertionsAsync(this, async () => {
