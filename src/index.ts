@@ -42,7 +42,7 @@ export function isJestMock(a: any) {
         Array.isArray(a.mock.calls);
 }
 
-export function fetchArgs(subject: Mock | jasmine.Spy): any[] {
+export function fetchArgs(subject: Mock | jasmine.Spy | Function): any[] {
     // jasmine spies come from doing `spyOn(thing, "method")`
     // jest mocks come from `jest.fn()`
     if (isJasmineSpy(subject)) {
