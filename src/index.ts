@@ -63,7 +63,7 @@ declare global {
 }
 export type Condition = (item: any) => boolean;
 
-function assert(expr: boolean, failMessage: string | (() => string)) {
+export function assert(expr: boolean, failMessage: string | (() => string)) {
     if (!expr) {
         if (typeof failMessage === "function") {
             failMessage = failMessage();
@@ -73,11 +73,11 @@ function assert(expr: boolean, failMessage: string | (() => string)) {
     return failMessage;
 }
 
-interface IHasIsNot {
+export interface IHasIsNot {
     isNot: boolean;
 }
 
-function runAssertions(ctx: IHasIsNot, func: () => string | (() => string)) {
+export function runAssertions(ctx: IHasIsNot, func: () => string | (() => string)) {
     try {
         const message = func() || "";
         return {
@@ -93,7 +93,7 @@ function runAssertions(ctx: IHasIsNot, func: () => string | (() => string)) {
 }
 
 
-async function runAssertionsAsync(ctx: IHasIsNot, func: () => Promise<void>) {
+export async function runAssertionsAsync(ctx: IHasIsNot, func: () => Promise<void>) {
     try {
         await func();
         return {
@@ -109,14 +109,6 @@ async function runAssertionsAsync(ctx: IHasIsNot, func: () => Promise<void>) {
 }
 
 
-function testIsQueryOrCommand(ctx: any, actual: any) {
-    assert(actual !== undefined, "Actual is undefined");
-    assert(actual.prototype !== undefined, `${ actual } is not a constructor`);
-    assert(typeof actual.prototype.execute === "function",
-        `${ actual } has no 'execute' function`);
-    return () => `expected ${ actual }${ notFor(ctx) }to be a query or command`;
-}
-
 function testIsInstance(actual: any, ctor: any) {
     assert(actual !== undefined, "actual is undefined");
     assert(actual !== null, "actual is null");
@@ -124,7 +116,7 @@ function testIsInstance(actual: any, ctor: any) {
         `Expected instance of ${ Object.prototype.toString.call(ctor) } but got ${ actual }`);
 }
 
-function notFor(self: any) {
+export function notFor(self: any) {
     return self.isNot
         ? " not "
         : " ";
@@ -146,7 +138,7 @@ function assertHasKeys(
     return msg;
 }
 
-function prettyPrint(obj: object | any[]) {
+export function prettyPrint(obj: object | any[]) {
     return JSON.stringify(obj, null, 2);
 }
 
