@@ -10,7 +10,7 @@
     "test": "jest",
     "prebuild": "rimraf dist",
     "build": "tsc",
-    "lint": "tslint **/*.ts",
+    "lint": "tslint -p .",
     "increment-package-version-beta": "cross-env VERSION_INCREMENT_STRATEGY=patch run-s \"zarro increment-package-json-version\"",
     "prerelease-beta": "run-s build test",
     "release-beta": "cross-env BETA=1 VERSION_INCREMENT_STRATEGY=patch run-s \"zarro release-npm\"",

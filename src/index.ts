@@ -84,6 +84,7 @@ declare global {
             toEql(other: any): void;
             toIntersectionEqual(other: object): void;
             toAllMatch(fn: Condition): void;
+            toContainElementLike(other: any): void;
         }
     }
 }
@@ -185,6 +186,15 @@ function intersect<T>(left: T[], right: T[]): T[] {
 
 beforeAll(() => {
     expect.extend({
+        toContainElementLike(actual: any[], other: any) {
+            return runAssertions(this, () => {
+                assert(Array.isArray(actual), `actual must be an array`);
+                const search = expect.objectContaining(other);
+                const found = actual.find(el => this.equals(el, search));
+                assert(found, `Found no match for\n${prettyPrint(other)}`);
+                return `Expected not to find anything matching\n${prettyPrint(other)}\nbut found:\n${prettyPrint(found)}`;
+            });
+        },
         toAllMatch(actual: any, condition: Condition) {
             return runAssertions(this, () => {
                 const die = (m: string) => {
