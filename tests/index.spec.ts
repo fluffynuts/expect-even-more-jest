@@ -264,9 +264,6 @@ describe(`expect-even-more-jest`, () => {
             )(`should throw when the provided value is not an async function`, async (actual) => {
                 // Arrange
                 // Act
-                console.log({
-                    actual
-                });
                 expect(
                     () => expect(actual).toBeAsyncFunction()
                 ).toThrow();
