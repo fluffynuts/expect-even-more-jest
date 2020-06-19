@@ -1,7 +1,8 @@
 import fs from "fs";
 import Mock = jest.Mock;
 import "expect-more-jest";
-import { isEqual as _isEqual } from "lodash";
+// import { isEqual as _isEqual } from "lodash";
+import _isEqual from "lodash.isequal";
 
 export function sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -9,82 +10,38 @@ export function sleep(ms: number): Promise<void> {
 
 export type Nullable<T> = (T | null);
 
-/**
- * Wrapper around lodash.isequal, which also accepts a debug
- * parameter -- when set true, failed equality checks will be
- * dumped to the console
- * @param left
- * @param right
- * @param debug
- */
-export function areEqual(
-    left: any,
-    right: any,
-    debug?: boolean) {
-    const result = _isEqual(left, right);
-    if (!result && debug) {
-        console.debug(`areEqual mismatch:\n` +
-            `left:\n${JSON.stringify(left)}\n` +
-            `right:${JSON.stringify(right)}`);
-    }
-    return result;
-}
-
-export function isJasmineSpy(a: any) {
-    return a &&
-        a.calls &&
-        typeof a.calls.all === "function";
-}
-
-export function isJestMock(a: any) {
-    return a &&
-        a.mock &&
-        Array.isArray(a.mock.calls);
-}
-
-export function fetchArgs(subject: Mock | jasmine.Spy | Function): any[] {
-    // jasmine spies come from doing `spyOn(thing, "method")`
-    // jest mocks come from `jest.fn()`
-    if (isJasmineSpy(subject)) {
-        const spy = subject as jasmine.Spy;
-        return spy.calls.all().map(c => c.args);
-    } else if (isJestMock(subject)) {
-        const mock = subject as Mock;
-        return mock.mock.calls;
-    } else {
-        throw new Error(`${subject} doesn't appear to be a jasmine spy or a jest mock?`);
-    }
-}
-
 declare global {
     namespace jest {
         interface Matchers<R> {
+            // values
             toBeAsyncFunction(): void;
             toBePromiseLike(): void;
             toBeConstructor(): void;
             toBeA(constructor: any): void;
             toBeAn(constructor: any): void;
+            toExist(): void;
+            toIntersectionEqual(other: object): void;
+
+            // mocks & spies
             toHaveBeenCalledOnce(): void;
             toHaveBeenCalledOnceWith(...args: any[]): void;
-            toBeHidden(): void;
-            toBeVisible(): void;
-            toBeQuery(): void;
-            toBeCommand(): void;
+
+            // promises
             toBeCompleted(): Promise<void>;
             toBeResolved(message?: string, timeout?: number): Promise<void>;
             toBeRejected(message?: string, timeout?: number): Promise<void>;
-            toExist(): void;
-            toBeDisabled(): void;
-            toBePrototypical(): void;
+
+            // file system
             toBeFile(): void;
             toBeFolder(): void;
+
+            // collections
             toBeEquivalentTo<T>(other: T[]): void;
             toHaveKey(key: string): void;
             toHaveKeys(key1: string, ...keys: string[]): void;
-            toEql(other: any): void;
-            toIntersectionEqual(other: object): void;
             toAllMatch(fn: Condition): void;
             toContainElementLike(other: any): void;
+
         }
     }
 }
@@ -120,11 +77,11 @@ export function runAssertions(ctx: IHasIsNot, func: () => string | (() => string
 }
 
 
-export async function runAssertionsAsync(ctx: IHasIsNot, func: () => Promise<void>) {
+export async function runAssertionsAsync(ctx: IHasIsNot, func: () => Promise<() => string>) {
     try {
-        await func();
+        let message = await func();
         return {
-            message: () => "",
+            message,
             pass: !ctx.isNot
         };
     } catch (e) {
@@ -191,8 +148,8 @@ beforeAll(() => {
                 assert(Array.isArray(actual), `actual must be an array`);
                 const search = expect.objectContaining(other);
                 const found = actual.find(el => this.equals(el, search));
-                assert(found, `Found no match for\n${prettyPrint(other)}`);
-                return `Expected not to find anything matching\n${prettyPrint(other)}\nbut found:\n${prettyPrint(found)}`;
+                assert(found, `Found no match for\n${ prettyPrint(other) }`);
+                return `Expected not to find anything matching\n${ prettyPrint(other) }\nbut found:\n${ prettyPrint(found) }`;
             });
         },
         toAllMatch(actual: any, condition: Condition) {
@@ -203,22 +160,18 @@ beforeAll(() => {
                 if (!Array.isArray(actual)) {
                     return die("Actual must be an array");
                 }
+                if (actual.length === 0) {
+                    return die("Actual should not be empty");
+                }
                 if (!condition) {
                     return die("condition not set");
                 }
-                const misMatches = actual.filter(condition);
-                assert(misMatches.length === 0,
+                const matches = actual.filter(condition);
+                assert(matches.length === actual.length,
                     `Some elements don't match the provided condition:\n\n${
-                        misMatches.map(m => JSON.stringify(m)).join("\n")
+                        matches.map(m => JSON.stringify(m)).join("\n")
                     }`);
                 return "Expected to find mismatches, but didn't";
-            });
-        },
-        toEql(actual: any, expected: any) {
-            return runAssertions(this, () => {
-                const msg = () => `expected ${ actual } to == ${ expected }`;
-                // tslint:disable-next-line:triple-equals
-                return assert(actual == expected, msg());
             });
         },
         toIntersectionEqual(actual: any, expected: any) {
@@ -281,7 +234,12 @@ beforeAll(() => {
             return runAssertions(this, () => {
                 const msg = () => `expected ${ actual } ${ notFor(this) }to be a file`;
                 assert(!!actual, msg);
-                assert(fs.existsSync(actual), msg);
+                assert((() => {
+                    if (!fs.existsSync(actual)) {
+                        return false;
+                    }
+                    return fs.statSync(actual).isFile();
+                })(), msg);
                 return msg;
             });
         },
@@ -298,20 +256,10 @@ beforeAll(() => {
                 return msg;
             });
         },
-        toBePrototypical(actual: any) {
-            return runAssertions(this, () => {
-                const msg = () => `expected${ notFor(this) }prototype, but got ${ prettyPrint(actual) }`;
-                assert(actual, msg);
-                assert(actual.prototype, msg);
-                return msg;
-            });
-        },
         toBeAsyncFunction(actual: any) {
             return runAssertions(this, () => {
                 const msg = () => `expected${ notFor(this) }async function but got ${ prettyPrint(actual) }`;
-                assert(Object.prototype.toString.call(actual) === "[object AsyncFunction]" ||
-                    Object.prototype.toString.call(actual) === "[object Function]",
-                    msg);
+                assert(Object.prototype.toString.call(actual) === "[object AsyncFunction]", msg);
                 return msg;
             });
         },
@@ -408,37 +356,30 @@ beforeAll(() => {
                 } else if (!completed && !this.isNot) {
                     fail(msg());
                 }
+                return msg;
             });
         },
         async toBeResolved(actual: Promise<any> | (() => Promise<any>), message?: string, timeout?: number) {
             return runAssertionsAsync(this, async () => {
-                let resolved: Nullable<boolean> = null;
-                if (typeof (actual) === "function") {
+                let
+                    state = "pending";
+                const msg = () => `expected${ notFor(this) }to complete promise (final state: ${ state })`;
+                if (typeof(actual) === "function") {
                     actual = actual();
                 }
-                timeout = timeout || 50;
-                const msg = () =>
-                    `expected${ notFor(this) }to resolve promise, but ${
-                        (resolved === null ? "it never completed" : "it rejected")
-                    }${ message ? "More info: " + message : "" }`;
                 if (!actual.then) {
                     return fail("actual is not a promise");
                 }
-                actual.then(
-                    () => resolved = true
-                ).catch(
-                    () => resolved = false
-                );
-                let slept = 0;
-                while (resolved === null && slept < timeout) {
-                    await sleep(50);
-                    slept += 50;
+                actual.then(() => {
+                    state = "resolved";
+                }).catch(() => {
+                    state = "rejected";
+                });
+                await sleep(50);
+                if (state === "resolved") {
+                    return msg;
                 }
-                if (resolved && this.isNot) {
-                    fail(msg());
-                } else if (!resolved && !this.isNot) {
-                    fail(msg());
-                }
+                throw new Error(msg());
             });
         },
         async toBeRejected(actual: Promise<any> | (() => Promise<any>), message?: string, timeout?: number) {
@@ -467,6 +408,7 @@ beforeAll(() => {
                 } else if (!rejected && !this.isNot) {
                     fail(msg());
                 }
+                return msg;
             });
         },
         toExist(actual: any) {
@@ -475,60 +417,54 @@ beforeAll(() => {
                 assert(actual !== null && actual !== undefined, msg);
                 return msg;
             });
-        },
-        toBeDisabled(actual: HTMLInputElement | HTMLButtonElement) {
-            return runAssertions(this, () => {
-                const msg = () => `Expected ${ actual }${ notFor(this) }to be disabled`;
-                assert(actual.disabled, msg);
-                return msg;
-            });
-        },
-        toHaveReceivedNoCallsAtAll(mockedObject: any) {
-            return runAssertions(this, () => {
-                const called = Object.getOwnPropertyNames(
-                    Object.getPrototypeOf(mockedObject)
-                ).reduce((acc: string[], cur: string) => {
-                    const prop = mockedObject[cur];
-                    if (typeof prop.mock === "undefined") {
-                        return acc;
-                    }
-                    if (prop.mock.calls && prop.mock.calls.length) {
-                        acc.push(cur);
-                    }
-                    return acc;
-                }, []);
-                const msg = () => `expected${ notFor(this) }to have received any calls, but got ${ called }`;
-                assert(!called.length, msg);
-                return msg;
-            });
-        },
-        toHaveReceivedOnly(mockedObject: any,
-                           ...calls: string[]) {
-
-            return runAssertions(this, () => {
-                const called = Object.getOwnPropertyNames(
-                    Object.getPrototypeOf(mockedObject)
-                ).reduce((acc: string[], cur: string) => {
-                    const prop = mockedObject[cur];
-                    if (typeof prop.mock === "undefined") {
-                        return acc;
-                    }
-                    if (prop.mock.calls &&
-                        prop.mock.calls.length &&
-                        calls.indexOf(cur) === -1) {
-                        acc.push(cur);
-                    }
-                    return acc;
-                }, []);
-                const msg = () => `expected${ notFor(this) }to have received any calls, but got ${ called }`;
-                assert(!called.length, msg);
-                return msg;
-            });
         }
     });
 });
 
-export function stringLike(...parts: string[]) {
-    const re = [".*"].concat(parts.join(".*")).concat([".*"]).join("");
-    return expect.stringMatching(new RegExp(re));
+/**
+ * Wrapper around lodash.isequal, which also accepts a debug
+ * parameter -- when set true, failed equality checks will be
+ * dumped to the console
+ * @param left
+ * @param right
+ * @param debug
+ */
+function areEqual(
+    left: any,
+    right: any,
+    debug?: boolean) {
+    const result = _isEqual(left, right);
+    if (!result && debug) {
+        console.debug(`areEqual mismatch:\n` +
+            `left:\n${ JSON.stringify(left) }\n` +
+            `right:${ JSON.stringify(right) }`);
+    }
+    return result;
 }
+
+function isJasmineSpy(a: any) {
+    return a &&
+        a.calls &&
+        typeof a.calls.all === "function";
+}
+
+export function isJestMock(a: any) {
+    return a &&
+        a.mock &&
+        Array.isArray(a.mock.calls);
+}
+
+function fetchArgs(subject: Mock | jasmine.Spy | Function): any[] {
+    // jasmine spies come from doing `spyOn(thing, "method")`
+    // jest mocks come from `jest.fn()`
+    if (isJasmineSpy(subject)) {
+        const spy = subject as jasmine.Spy;
+        return spy.calls.all().map(c => c.args);
+    } else if (isJestMock(subject)) {
+        const mock = subject as Mock;
+        return mock.mock.calls;
+    } else {
+        throw new Error(`${ subject } doesn't appear to be a jasmine spy or a jest mock?`);
+    }
+}
+
