@@ -243,6 +243,23 @@ describe(`expect-even-more-jest`, () => {
                     .toThrow();
                 // Assert
             });
+
+            it(`should do regex matching if it encounters a positionally matched string arg with regex expectation`,
+                async () => {
+                    // Arrange
+                    const
+                        spy = jasmine.createSpy("someSpy"),
+                        mock = jest.fn(),
+                        message = "Hello there! This is an error, wot!";
+                    // Act
+                    spy(message);
+                    mock(message);
+                    // Assert
+                    expect(spy)
+                        .toHaveBeenCalledOnceWith(/this is an error/i);
+                    expect(mock)
+                        .toHaveBeenCalledOnceWith(/this is an error/i);
+                });
         });
     });
 
@@ -275,8 +292,12 @@ describe(`expect-even-more-jest`, () => {
             it(`should pass for something which is considered to be a promise`, async () => {
                 // Arrange
                 // Act
-                expect(new Promise<any>(() => {})).toBePromiseLike();
-                expect({ then: () => {} }).toBePromiseLike();
+                expect(new Promise<any>(() => {
+                })).toBePromiseLike();
+                expect({
+                    then: () => {
+                    }
+                }).toBePromiseLike();
                 // Assert
             });
             it(`should fail for something which is not a promise (ie, a value)`, async () => {

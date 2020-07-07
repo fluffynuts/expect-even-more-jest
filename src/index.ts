@@ -315,13 +315,20 @@ beforeAll(() => {
         },
         toHaveBeenCalledOnceWith(actual: Mock | jasmine.Spy, ...args: any[]) {
             return runAssertions(this, () => {
-                expect(actual).toHaveBeenCalled();
-                expect(actual).toHaveBeenCalledWith(...args);
-                const allArgs = fetchArgs(actual);
-                const matching = allArgs.filter(
-                    a => {
+                const receivedArgs = fetchArgs(actual);
+                const matching = receivedArgs.filter(
+                    received => {
                         try {
-                            expect(a).toEqual(args);
+                            expect(received.length)
+                                .toEqual(args.length);
+                            received.forEach((r: any, idx: number) => {
+                                const test = args[idx];
+                                if (typeof r === "string" && test instanceof RegExp) {
+                                    expect(r).toMatch(test);
+                                } else {
+                                    expect(r).toEqual(test);
+                                }
+                            });
                             return true;
                         } catch (e) {
                             return false;
