@@ -21,6 +21,7 @@ declare global {
             toBeAn(constructor: any): void;
             toExist(): void;
             toIntersectionEqual(other: object): void;
+            toBeError(withMessage?: string | RegExp): void;
 
             // mocks & spies
             toHaveBeenCalledOnce(): void;
@@ -422,6 +423,29 @@ beforeAll(() => {
             return runAssertions(this, () => {
                 const msg = () => `Expected ${ actual }${ notFor(this) }to exist`;
                 assert(actual !== null && actual !== undefined, msg);
+                return msg;
+            });
+        },
+        toBeError(actual: Error, match?: string | RegExp) {
+            return runAssertions(this, () => {
+                let meta = "";
+                if (match) {
+                    if (match instanceof RegExp) {
+                        meta = ` to match ${match}`
+                    } else {
+                        meta = ` with message ${match}`
+                    }
+                }
+                const msg = () => `Expected ${actual }${ notFor(this)} to be an error${meta}`;
+                // noinspection SuspiciousTypeOfGuard
+                assert(actual instanceof Error, msg);
+                if (match) {
+                    if (match instanceof RegExp) {
+                        assert(!!actual.message.match(match), msg);
+                    } else {
+                        assert(actual.message === match, msg);
+                    }
+                }
                 return msg;
             });
         }
