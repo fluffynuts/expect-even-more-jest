@@ -5,6 +5,8 @@
     ],
     "jsRules": {},
     "rules": {
+        "ban-types": false,
+        "one-variable-per-declaration": false,
         "quotemark": [ true, "double"]
     },
     "rulesDirectory": []

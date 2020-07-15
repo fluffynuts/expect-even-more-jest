@@ -45,7 +45,6 @@ describe(`expect-even-more-jest', () => {
         await expect(Promise.resolve()).toBeResolved("should have resolved", 5000);
         // test that a promise rejects within a timeframe (defaults to 50 ms)
         await expect(Promise.reject()).toBeRejected("should have rejected", 123);
-        expect(async () => await Promise.resolve()).toBeAsyncFunction();
         expect(new Promise(() => {})).toBePromiseLike();
 
         // file system

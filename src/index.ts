@@ -14,7 +14,6 @@ declare global {
     namespace jest {
         interface Matchers<R> {
             // values
-            toBeAsyncFunction(): void;
             toBePromiseLike(): void;
             toBeConstructor(): void;
             toBeA(constructor: any): void;
@@ -80,7 +79,7 @@ export function runAssertions(ctx: IHasIsNot, func: () => string | (() => string
 
 export async function runAssertionsAsync(ctx: IHasIsNot, func: () => Promise<() => string>) {
     try {
-        let message = await func();
+        const message = await func();
         return {
             message,
             pass: !ctx.isNot
@@ -128,7 +127,7 @@ export function prettyPrint(obj: object | any[]) {
 }
 
 function intersect<T>(left: T[], right: T[]): T[] {
-    const result: Array<T> = [];
+    const result: T[] = [];
     left.forEach(value => {
         if (result.indexOf(value) === -1 && right.indexOf(value) > -1) {
             result.push(value);
@@ -254,13 +253,6 @@ beforeAll(() => {
                     }
                     return fs.statSync(actual).isDirectory();
                 })(), msg);
-                return msg;
-            });
-        },
-        toBeAsyncFunction(actual: any) {
-            return runAssertions(this, () => {
-                const msg = () => `expected${ notFor(this) }async function but got ${ prettyPrint(actual) }`;
-                assert(Object.prototype.toString.call(actual) === "[object AsyncFunction]", msg);
                 return msg;
             });
         },
@@ -466,6 +458,7 @@ function areEqual(
     debug?: boolean) {
     const result = _isEqual(left, right);
     if (!result && debug) {
+        // tslint:disable-next-line:no-console
         console.debug(`areEqual mismatch:\n` +
             `left:\n${ JSON.stringify(left) }\n` +
             `right:${ JSON.stringify(right) }`);

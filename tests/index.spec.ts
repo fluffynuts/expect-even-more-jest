@@ -7,6 +7,7 @@ describe(`expect-even-more-jest`, () => {
         // Arrange
         // Act
         expect(() => {
+            // intentionally empty
         }).toBeFunction();
         // Assert
     });
@@ -37,6 +38,7 @@ describe(`expect-even-more-jest`, () => {
             class MooCow {
             }
 
+            // tslint:disable-next-line:max-classes-per-file
             class ExcitedMooCow extends MooCow {
             }
         });
@@ -72,6 +74,7 @@ describe(`expect-even-more-jest`, () => {
                 // Assert
             });
 
+            // tslint:disable-next-line:max-classes-per-file
             class MooCakes {
             }
         });
@@ -264,38 +267,16 @@ describe(`expect-even-more-jest`, () => {
     });
 
     describe(`promises`, () => {
-        describe(`toBeAsyncFunction`, () => {
-            it(`should not throw when the provided value is an async function`, async () => {
-                // Arrange
-                // Act
-                expect(
-                    () => expect(async () => await Promise.resolve())
-                        .toBeAsyncFunction()
-                ).not.toThrow();
-                // Assert
-            });
-
-            it.each(
-                [{}, null, 1, "hello", () => {
-                }]
-            )(`should throw when the provided value is not an async function`, async (actual) => {
-                // Arrange
-                // Act
-                expect(
-                    () => expect(actual).toBeAsyncFunction()
-                ).toThrow();
-                // Assert
-            });
-        });
-
         describe(`toBePromiseLike`, () => {
             it(`should pass for something which is considered to be a promise`, async () => {
                 // Arrange
                 // Act
                 expect(new Promise<any>(() => {
+                    // intentionally left blank
                 })).toBePromiseLike();
                 expect({
                     then: () => {
+                        // intentionally left blank
                     }
                 }).toBePromiseLike();
                 // Assert
@@ -317,6 +298,7 @@ describe(`expect-even-more-jest`, () => {
             it(`should not throw when negated if the promise hasn't been resolved or rejected`, async () => {
                 // Arrange
                 const promise = new Promise(() => {
+                    // intentionally left blank
                 });
                 // Act
                 await expect(promise).not.toBeCompleted();
@@ -340,6 +322,7 @@ describe(`expect-even-more-jest`, () => {
             it(`should not throw when negated if the promise hasn't been resolved or rejected`, async () => {
                 // Arrange
                 const unresolved = new Promise(() => {
+                    // intentionally left blank
                 });
                 const rejected = new Promise((resolve, reject) => {
                     setTimeout(reject, 20);
@@ -367,6 +350,7 @@ describe(`expect-even-more-jest`, () => {
             it(`should not throw when negated on uncompleted promise`, async () => {
                 // Arrange
                 const unresolved = new Promise(() => {
+                    // intentionally left blank
                 });
                 // Act
                 await expect(unresolved).not.toBeRejected();
