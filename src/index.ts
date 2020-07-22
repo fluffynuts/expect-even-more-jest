@@ -308,7 +308,7 @@ beforeAll(() => {
         },
         toHaveBeenCalledOnceWith(actual: Mock | jasmine.Spy, ...args: any[]) {
             return runAssertions(this, () => {
-                const receivedArgs = fetchArgs(actual);
+                const receivedArgs = fetchSpyOrMockArgs(actual);
                 const matching = receivedArgs.filter(
                     received => {
                         try {
@@ -478,7 +478,8 @@ export function isJestMock(a: any) {
         Array.isArray(a.mock.calls);
 }
 
-function fetchArgs(subject: Mock | jasmine.Spy | Function): any[] {
+// NB: this is useful from other modules; leave it exported!
+export function fetchSpyOrMockArgs(subject: Mock | jasmine.Spy | Function): any[] {
     // jasmine spies come from doing `spyOn(thing, "method")`
     // jest mocks come from `jest.fn()`
     if (isJasmineSpy(subject)) {
