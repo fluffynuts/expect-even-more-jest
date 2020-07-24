@@ -1,4 +1,8 @@
 # expect-even-more-jest
+![Test](https://github.com/fluffynuts/expect-even-more-jest/workflows/Tests/badge.svg)
+
+![npm](https://img.shields.io/npm/v/expect-even-more-jest)
+
 ## What is it?
 
 It's [expect-more-jest](https://www.npmjs.com/package/expect-more-jest) with _even more_ stuff!
