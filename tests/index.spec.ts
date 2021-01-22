@@ -55,6 +55,30 @@ describe(`expect-even-more-jest`, () => {
                     .toExist();
                 // Assert
             });
+
+            it(`should fail when the value is not null/undefined & negaged`, async () => {
+                // Arrange
+                // Act
+                expect(() => expect("foo").not.toExist())
+                    .toThrow(/not to exist/)
+                // Assert
+            });
+
+            it(`should throw for null`, async () => {
+                // Arrange
+                // Act
+                expect(() => expect(null).toExist())
+                    .toThrow(/(?!not) to exist/);
+                // Assert
+            });
+
+            it(`should throw for undefined`, async () => {
+                // Arrange
+                // Act
+                expect(() => expect(undefined).toExist())
+                    .toThrow(/(?!not) to exist/);
+                // Assert
+            });
         });
 
         describe(`toBeConstructor`, () => {
