@@ -42,6 +42,9 @@ declare global {
             toAllMatch(fn: Condition): void;
             toContainElementLike(other: any): void;
 
+            // DOM
+            toHaveAttribute(attrib: string, expected?: string): void;
+
         }
     }
 }
@@ -143,6 +146,22 @@ function intersect<T>(left: T[], right: T[]): T[] {
 
 beforeAll(() => {
     expect.extend({
+        toHaveAttribute(actual: HTMLElement, attrib: string, expected: string) {
+            return runAssertions(this, () => {
+                assert(actual instanceof HTMLElement, `actual must be an html element`);
+                const checkValue = expected !== undefined;
+                if (checkValue) {
+                    assert(actual.getAttribute(attrib) === expected,
+                        `Expected to find attribute ${ attrib } with value ${ expected }`)
+                } else {
+                    assert(actual.getAttribute(attrib) !== null,
+                        `Expected to find attribute '${ attrib }'`);
+                }
+                return checkValue
+                    ? `Expected not to find attribute '${ attrib }' with value '${ expected }'`
+                    : `Expected not to find attribute '${ attrib }'`;
+            });
+        },
         toContainElementLike(actual: any[], other: any) {
             return runAssertions(this, () => {
                 assert(Array.isArray(actual), `actual must be an array`);
@@ -208,7 +227,7 @@ beforeAll(() => {
                 assert(!!expected, "key is not set");
                 const msg = () => `expected ${ prettyPrint(actual) } to have key "${ expected }"`;
                 return assertHasKeys(
-                    actual, [expected], msg
+                    actual, [ expected ], msg
                 );
             });
         },
@@ -364,7 +383,7 @@ beforeAll(() => {
                 let
                     state = "pending";
                 const msg = () => `expected${ notFor(this) }to complete promise (final state: ${ state })`;
-                if (typeof(actual) === "function") {
+                if (typeof (actual) === "function") {
                     actual = actual();
                 }
                 if (!actual.then) {
@@ -423,12 +442,12 @@ beforeAll(() => {
                 let meta = "";
                 if (match) {
                     if (match instanceof RegExp) {
-                        meta = ` to match ${match}`
+                        meta = ` to match ${ match }`
                     } else {
-                        meta = ` with message ${match}`
+                        meta = ` with message ${ match }`
                     }
                 }
-                const msg = () => `Expected ${actual }${ notFor(this)} to be an error${meta}`;
+                const msg = () => `Expected ${ actual }${ notFor(this) } to be an error${ meta }`;
                 // noinspection SuspiciousTypeOfGuard
                 assert(actual instanceof Error, msg);
                 if (match) {

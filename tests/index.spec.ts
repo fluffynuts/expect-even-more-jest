@@ -108,7 +108,7 @@ describe(`expect-even-more-jest`, () => {
                 // Arrange
                 const
                     obj = {},
-                    values = [undefined, null];
+                    values = [ undefined, null ];
                 // Act
                 expect(() => expect(obj)
                     .toIntersectionEqual(faker.random.arrayElement(values) as any)
@@ -446,9 +446,9 @@ describe(`expect-even-more-jest`, () => {
             it(`should not throw when same collections just out of order`, async () => {
                 // Arrange
                 const
-                    a = [1, 2, 3],
-                    b = [3, 2, 1],
-                    c = [1, 3, 2];
+                    a = [ 1, 2, 3 ],
+                    b = [ 3, 2, 1 ],
+                    c = [ 1, 3, 2 ];
                 // Act
                 expect(a)
                     .toBeEquivalentTo(b);
@@ -462,10 +462,10 @@ describe(`expect-even-more-jest`, () => {
             it(`should fail on totally different collections`, async () => {
                 // Arrange
                 const
-                    a = [1, 2, 3],
-                    shorter = [1, 2],
-                    longer = [1, 2, 3, 4],
-                    different = [2, 5, 6];
+                    a = [ 1, 2, 3 ],
+                    shorter = [ 1, 2 ],
+                    longer = [ 1, 2, 3, 4 ],
+                    different = [ 2, 5, 6 ];
                 // Act
                 expect(a)
                     .not.toBeEquivalentTo(shorter);
@@ -479,7 +479,7 @@ describe(`expect-even-more-jest`, () => {
         describe(`toHaveKey`, () => {
             it(`should fail when object does not exist`, async () => {
                 // Arrange
-                const obj = faker.random.arrayElement([null, undefined]);
+                const obj = faker.random.arrayElement([ null, undefined ]);
                 // Act
                 expect(() =>
                     expect(obj)
@@ -522,7 +522,7 @@ describe(`expect-even-more-jest`, () => {
         describe(`toHaveKeys`, () => {
             it(`should fail when object does not exist`, async () => {
                 // Arrange
-                const obj = faker.random.arrayElement([null, undefined]);
+                const obj = faker.random.arrayElement([ null, undefined ]);
                 // Act
                 expect(() =>
                     expect(obj)
@@ -590,7 +590,7 @@ describe(`expect-even-more-jest`, () => {
             it(`should fail if even one element does not match`, async () => {
                 // Arrange
                 const
-                    b = [4, 5, 6];
+                    b = [ 4, 5, 6 ];
                 // Act
                 expect(b)
                     .not.toAllMatch(i => i < 6);
@@ -599,7 +599,7 @@ describe(`expect-even-more-jest`, () => {
             it(`should pass if all elements match`, async () => {
                 // Arrange
                 const
-                    a = [1, 2, 3];
+                    a = [ 1, 2, 3 ];
                 // Act
                 expect(a)
                     .toAllMatch(i => i < 4);
@@ -610,7 +610,7 @@ describe(`expect-even-more-jest`, () => {
         describe(`toContainElementLike`, () => {
             it(`should find the single element`, async () => {
                 // Arrange
-                const array = [{ foo: "foo", bar: "bar" }];
+                const array = [ { foo: "foo", bar: "bar" } ];
                 // Act
                 expect(array)
                     .toContainElementLike({ foo: "foo" });
@@ -619,7 +619,7 @@ describe(`expect-even-more-jest`, () => {
 
             it(`should throw when it can't find a match`, async () => {
                 // Arrange
-                const array = [{ foo: "foo", bar: "bar" }];
+                const array = [ { foo: "foo", bar: "bar" } ];
                 // Act
                 expect(() =>
                     expect(array)
@@ -630,7 +630,7 @@ describe(`expect-even-more-jest`, () => {
 
             it(`should not throw when negated and it can't find a match`, async () => {
                 // Arrange
-                const array = [{ foo: "foo", bar: "bar" }];
+                const array = [ { foo: "foo", bar: "bar" } ];
                 // Act
                 expect(() =>
                     expect(array)
@@ -641,7 +641,7 @@ describe(`expect-even-more-jest`, () => {
 
             it(`should throw when negated and can find the single element`, async () => {
                     // Arrange
-                    const array = [{ foo: "foo", bar: "bar" }];
+                    const array = [ { foo: "foo", bar: "bar" } ];
                     // Act
                     expect(() => {
                         expect(array)
@@ -704,6 +704,51 @@ describe(`expect-even-more-jest`, () => {
             // Act
             expect(error)
                 .not.toBeError(/le error/);
+            // Assert
+        });
+    });
+
+    describe(`dom nodes`, () => {
+        it(`should assert that a node has a given attribute with string value`, async () => {
+            // Arrange
+            const node = document.createElement("div");
+            node.setAttribute("foo", "bar");
+            // Act
+            expect(() =>
+                expect(node)
+                    .toHaveAttribute("foo", "bar")
+            ).not.toThrow();
+            expect(() =>
+                expect(node).not.toHaveAttribute("foo", "bar")
+            ).toThrow("Expected not to find attribute 'foo' with value 'bar'");
+            // Assert
+        });
+
+        it(`should assert that the attribute is not the unexpected value`, async () => {
+            // Arrange
+            const node = document.createElement("div");
+            node.setAttribute("foo", "quux");
+            // Act
+            expect(() =>
+                expect(node)
+                    .not.toHaveAttribute("foo", "bar")
+            ).not.toThrow();
+            expect(() => expect(node).not.toHaveAttribute("foo", "quux"))
+                .toThrow();
+            // Assert
+        });
+
+        it(`should assert the attribute exists at all`, async () => {
+            // Arrange
+            const node = document.createElement("div");
+            node.setAttribute("foo", "bar");
+            // Act
+            expect(() =>
+                expect(node)
+                    .toHaveAttribute("foo")
+            ).not.toThrow();
+            expect(() => expect(node).toHaveAttribute("wibbly"))
+                .toThrow();
             // Assert
         });
     });
