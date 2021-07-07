@@ -26,6 +26,7 @@ declare global {
             // mocks & spies
             toHaveBeenCalledOnce(): void;
             toHaveBeenCalledOnceWith(...args: any[]): void;
+            toHaveBeenCalledOnceWithNoArgs(): void;
 
             // promises
             toBeCompleted(): Promise<void>;
@@ -331,11 +332,28 @@ beforeAll(() => {
         toHaveBeenCalledOnce(actual: Mock) {
             return runAssertions(this, () => {
                 expect(actual).toHaveBeenCalledTimes(1);
-                return () => `Expected${ notFor(this) }to have been called once`;
+                return () => `expected${ notFor(this) }to have been called once`;
+            });
+        },
+        toHaveBeenCalledOnceWithNoArgs(actual: Mock | jasmine.Spy) {
+            return runAssertions(this, () => {
+                const receivedArgs = fetchSpyOrMockArgs(actual);
+                const matching = receivedArgs.filter(r => r.length === 0);
+                assert(
+                    matching.length === 1,
+                    `expected${ notFor(this) }to find exactly 1 call with no arguments, but found ${ matching.length }`
+                );
+                return () => `expected${ notFor(this) }to have found exactly 1 call with no arguments`;
             });
         },
         toHaveBeenCalledOnceWith(actual: Mock | jasmine.Spy, ...args: any[]) {
             return runAssertions(this, () => {
+                if (args.length === 0) {
+                    console.warn(`
+'toHaveBeenCalledOnceWith' was invoked with no arguments.
+If this is by design, rather use 'toHaveBeenCalledOnceWithNoArgs()'.`.trim()
+                    );
+                }
                 const receivedArgs = fetchSpyOrMockArgs(actual);
                 const matching = receivedArgs.filter(
                     received => {
@@ -357,9 +375,9 @@ beforeAll(() => {
                     });
                 assert(
                     matching.length === 1,
-                    `Should have found exactly one matching call, but found ${ matching.length }`
+                    `expected${ notFor(this) }to have found exactly one matching call, but found ${ matching.length }`
                 );
-                return () => `Expected${ notFor(this) }to have been called once with ${ args }`;
+                return () => `expected${ notFor(this) }to have been called once with ${ args }`;
             });
         },
         async toBeCompleted(actual: Promise<any>) {
@@ -441,7 +459,7 @@ beforeAll(() => {
         },
         toExist(actual: any) {
             return runAssertions(this, () => {
-                const msg = () => `Expected ${ actual }${ notFor(this) }to exist`;
+                const msg = () => `expected ${ actual }${ notFor(this) }to exist`;
                 assert(actual !== null && actual !== undefined, msg);
                 return msg;
             });
