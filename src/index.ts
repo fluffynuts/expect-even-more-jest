@@ -21,6 +21,7 @@ declare global {
             toExist(): void;
             toIntersectionEqual(other: object): void;
             toBeError(withMessage?: string | RegExp): void;
+            toBeEmptyOrWhitespace(): void;
 
             // mocks & spies
             toHaveBeenCalledOnce(): void;
@@ -144,8 +145,22 @@ function intersect<T>(left: T[], right: T[]): T[] {
     return result;
 }
 
+function isEmptyOrWhitespace(value: string | null | undefined) {
+    return value === null ||
+        value === undefined ||
+        (typeof value === "string" &&
+            (value || "").toString().length === 0
+        );
+}
+
 beforeAll(() => {
     expect.extend({
+        toBeEmptyOrWhitespace(actual: string | null | undefined) {
+            return runAssertions(this, () => {
+                assert(isEmptyOrWhitespace(actual), `Expected '${ actual }' to be empty or whitespace string`);
+                return `Expected '${ actual }' not to be empty or whitespace string`;
+            });
+        },
         toHaveAttribute(actual: HTMLElement, attrib: string, expected: string) {
             return runAssertions(this, () => {
                 assert(actual instanceof HTMLElement, `actual must be an html element`);
@@ -315,12 +330,6 @@ beforeAll(() => {
         },
         toHaveBeenCalledOnce(actual: Mock) {
             return runAssertions(this, () => {
-                if (this.isNot) {
-                    throw new Error([
-                        "Negation of 'toHaveBeenCalledOnce' is ambiguous ",
-                        "(do you mean 'not at all' or 'any number except 1'?)"
-                    ].join(""));
-                }
                 expect(actual).toHaveBeenCalledTimes(1);
                 return () => `Expected${ notFor(this) }to have been called once`;
             });

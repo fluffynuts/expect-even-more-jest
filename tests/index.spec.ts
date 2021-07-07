@@ -14,25 +14,29 @@ describe(`expect-even-more-jest`, () => {
 
     describe(`values`, () => {
         describe(`toBeA / toBeAn`, () => {
-            it(`should not throw when the value is of the requested type`, async () => {
-                // Arrange
-                // Act
-                expect(() => expect(new MooCow())
-                    .toBeA(MooCow)
-                ).not.toThrow();
-                expect(() => expect(new ExcitedMooCow())
-                    .toBeAn(ExcitedMooCow)
-                ).not.toThrow();
-                // Assert
+            describe(`when the value is of the requested type`, () => {
+                it(`should pass`, async () => {
+                    // Arrange
+                    // Act
+                    expect(() => expect(new MooCow())
+                        .toBeA(MooCow)
+                    ).not.toThrow();
+                    expect(() => expect(new ExcitedMooCow())
+                        .toBeAn(ExcitedMooCow)
+                    ).not.toThrow();
+                    // Assert
+                });
             });
 
-            it(`should throw when the value is not of the required prototype`, async () => {
-                // Arrange
-                // Act
-                expect(() => expect(new MooCow())
-                    .toBeAn(ExcitedMooCow)
-                ).toThrow();
-                // Assert
+            describe(`when the value is not of the requested type`, () => {
+                it(`should fail`, async () => {
+                    // Arrange
+                    // Act
+                    expect(() => expect(new MooCow())
+                        .toBeAn(ExcitedMooCow)
+                    ).toThrow();
+                    // Assert
+                });
             });
 
             class MooCow {
@@ -44,58 +48,90 @@ describe(`expect-even-more-jest`, () => {
         });
 
         describe(`toExist`, () => {
-            it(`should pass for any value which is not null or undefined`, async () => {
-                // Arrange
-                // Act
-                expect("foo")
-                    .toExist();
-                expect(1)
-                    .toExist();
-                expect(0)
-                    .toExist();
-                // Assert
+            describe(`given any non-null, defined value`, () => {
+                it(`should pass`, async () => {
+                    // Arrange
+                    // Act
+                    expect("foo")
+                        .toExist();
+                    expect(1)
+                        .toExist();
+                    expect(0)
+                        .toExist();
+                    // Assert
+                });
             });
 
-            it(`should fail when the value is not null/undefined & negaged`, async () => {
-                // Arrange
-                // Act
-                expect(() => expect("foo").not.toExist())
-                    .toThrow(/not to exist/)
-                // Assert
+            describe(`when the value is not null / undefined`, () => {
+                describe(`and assertion is negated`, () => {
+                    it(`should fail`, async () => {
+                        // Arrange
+                        // Act
+                        expect(() => expect("foo").not.toExist())
+                            .toThrow(/not to exist/)
+                        // Assert
+                    });
+
+                });
+            });
+            describe(`given null`, () => {
+                it(`should fail`, async () => {
+                    // Arrange
+                    // Act
+                    expect(() => expect(null).toExist())
+                        .toThrow(/(?!not) to exist/);
+                    // Assert
+                });
             });
 
-            it(`should throw for null`, async () => {
-                // Arrange
-                // Act
-                expect(() => expect(null).toExist())
-                    .toThrow(/(?!not) to exist/);
-                // Assert
-            });
-
-            it(`should throw for undefined`, async () => {
-                // Arrange
-                // Act
-                expect(() => expect(undefined).toExist())
-                    .toThrow(/(?!not) to exist/);
-                // Assert
+            describe(`given undefined`, () => {
+                it(`should fail`, async () => {
+                    // Arrange
+                    // Act
+                    expect(() => expect(undefined).toExist())
+                        .toThrow(/(?!not) to exist/);
+                    // Assert
+                });
             });
         });
 
         describe(`toBeConstructor`, () => {
-            it(`should not throw for a constructable`, async () => {
-                // Arrange
-                // Act
-                expect(() => expect(MooCakes).toBeConstructor())
-                    .not.toThrow();
-                // Assert
+            describe(`given a constructable`, () => {
+                it(`should pass`, async () => {
+                    // Arrange
+                    // Act
+                    expect(() => expect(MooCakes).toBeConstructor())
+                        .not.toThrow();
+                    // Assert
+                });
+                describe(`when negated`, () => {
+                    it(`should fail`, async () => {
+                        // Arrange
+                        // Act
+                        expect(() => expect(MooCakes).not.toBeConstructor())
+                            .toThrow();
+                        // Assert
+                    });
+                });
             });
 
-            it(`should throw for a non constructable`, async () => {
-                // Arrange
-                // Act
-                expect(() => expect({}).toBeConstructor())
-                    .toThrow();
-                // Assert
+            describe(`given a non-constructable`, () => {
+                it(`should fail`, async () => {
+                    // Arrange
+                    // Act
+                    expect(() => expect({}).toBeConstructor())
+                        .toThrow();
+                    // Assert
+                });
+                describe(`when negated`, () => {
+                    it(`should pass`, async () => {
+                        // Arrange
+                        // Act
+                        expect(() => expect({}).not.toBeConstructor())
+                            .not.toThrow();
+                        // Assert
+                    });
+                });
             });
 
             // tslint:disable-next-line:max-classes-per-file
@@ -104,175 +140,459 @@ describe(`expect-even-more-jest`, () => {
         });
 
         describe(`toIntersectionEqual`, () => {
-            it(`should throw if actual either value is null or undefined`, async () => {
-                // Arrange
-                const
-                    obj = {},
-                    values = [ undefined, null ];
-                // Act
-                expect(() => expect(obj)
-                    .toIntersectionEqual(faker.random.arrayElement(values) as any)
-                ).toThrow();
-                expect(() => expect(faker.random.arrayElement(values) as any)
-                    .toIntersectionEqual(obj)
-                ).toThrow();
-                // Assert
+            describe(`when the value is null`, () => {
+                it(`should throw if actual either value is null or undefined`, async () => {
+                    // Arrange
+                    const
+                        obj = {},
+                        value = null;
+                    // Act
+                    expect(() => expect(obj)
+                        .toIntersectionEqual(value as any)
+                    ).toThrow();
+                    expect(() => expect(value as any)
+                        .toIntersectionEqual(obj)
+                    ).toThrow();
+                    // Assert
+                });
             });
 
-            it(`should not throw if there are some matching props`, async () => {
-                // Arrange
-                const
-                    actual = { foo: 1, bar: 2 },
-                    other = { foo: 1, quux: 3 };
-                // Act
-                expect(() => expect(actual).toIntersectionEqual(other))
-                    .not.toThrow();
-                // Assert
+            describe(`when the value is undefined`, () => {
+                it(`should throw`, async () => {
+                    // Arrange
+                    const
+                        obj = {},
+                        value = undefined;
+                    // Act
+                    expect(() => expect(obj)
+                        .toIntersectionEqual(value as any)
+                    ).toThrow();
+                    expect(() => expect(value as any)
+                        .toIntersectionEqual(obj)
+                    ).toThrow();
+                    // Assert
+                });
             });
 
-            it(`should throw if there are no props in common`, async () => {
-                // Arrange
-                const
-                    actual = { foo: 1 },
-                    other = { bar: 1 };
-                // Act
-                expect(() => expect(actual).toIntersectionEqual(other))
-                    .toThrow();
-                // Assert
+            describe(`when some matching props`, () => {
+                it(`should pass`, async () => {
+                    // Arrange
+                    const
+                        actual = { foo: 1, bar: 2 },
+                        other = { foo: 1, quux: 3 };
+                    // Act
+                    expect(() => expect(actual).toIntersectionEqual(other))
+                        .not.toThrow();
+                    // Assert
+                });
+
+                describe(`and negated`, () => {
+                    it(`should fail`, async () => {
+                        // Arrange
+                        const
+                            actual = { foo: 1, bar: 2 },
+                            other = { foo: 1, quux: 3 };
+                        // Act
+                        expect(() => expect(actual).not.toIntersectionEqual(other))
+                            .toThrow();
+                        // Assert
+                    });
+                });
             });
 
-            it(`should throw if there are common props which are not equal`, async () => {
-                // Arrange
-                const
-                    actual = { foo: 1, bar: 2 },
-                    other = { quux: 1, bar: 1 };
-                // Act
-                expect(() => expect(actual).toIntersectionEqual(other))
-                    .toThrow();
-                // Assert
+            describe(`when no props in common`, () => {
+                it(`should fail`, async () => {
+                    // Arrange
+                    const
+                        actual = { foo: 1 },
+                        other = { bar: 1 };
+                    // Act
+                    expect(() => expect(actual).toIntersectionEqual(other))
+                        .toThrow();
+                    // Assert
+                });
+
+                describe(`and negated`, () => {
+                    it(`should pass`, async () => {
+                        // Arrange
+                        const
+                            actual = { foo: 1 },
+                            other = { bar: 1 };
+                        // Act
+                        expect(() => expect(actual).not.toIntersectionEqual(other))
+                            .not.toThrow();
+                        // Assert
+                    });
+                });
+            });
+
+            describe(`when common props aren't equal`, () => {
+                it(`should fail`, async () => {
+                    // Arrange
+                    const
+                        actual = { foo: 1, bar: 2 },
+                        other = { quux: 1, bar: 1 };
+                    // Act
+                    expect(() => expect(actual).toIntersectionEqual(other))
+                        .toThrow();
+                    // Assert
+                });
+
+                describe(`and negated`, () => {
+                    it(`should pass`, async () => {
+                        // Arrange
+                        const
+                            actual = { foo: 1, bar: 2 },
+                            other = { quux: 1, bar: 1 };
+                        // Act
+                        expect(() => expect(actual).not.toIntersectionEqual(other))
+                            .not.toThrow();
+                        // Assert
+                    });
+                });
+            });
+        });
+
+        describe(`toBeEmptyOrWhitespace`, () => {
+            [
+                "",
+                null,
+                undefined
+            ].forEach(testCase => {
+                describe(`given '${ testCase }'`, () => {
+                    it(`should pass`, async () => {
+                        // Arrange
+                        // Act
+                        expect(() =>
+                            expect(testCase)
+                                .toBeEmptyOrWhitespace()
+                        ).not.toThrow();
+                        // Assert
+                    });
+                    describe(`and negated`, () => {
+                        it(`should fail`, async () => {
+                            // Arrange
+                            // Act
+                            expect(() =>
+                                expect(testCase)
+                                    .not.toBeEmptyOrWhitespace()
+                            ).toThrow();
+                            // Assert
+                        });
+                    });
+                });
             });
         });
     });
 
     describe(`mocks and spies`, () => {
         describe(`toHaveBeenCalledOnce`, () => {
-            it(`should not throw when a jasmine spy or jest mock has been called once`, async () => {
-                // Arrange
-                const
-                    spy = jasmine.createSpy("jasmineSpy"),
-                    mock = jest.fn();
-                // Act
-                spy();
-                mock();
-                expect(
-                    () => expect(spy).toHaveBeenCalledOnce()
-                ).not.toThrow()
-                expect(
-                    () => expect(mock).toHaveBeenCalledOnce()
-                ).not.toThrow()
-                // Assert
-            });
-            it(`should throw if a jasmine spy or jest mock was not called at all`, async () => {
-                // Arrange
-                const
-                    spy = jasmine.createSpy("jasmineSpy"),
-                    mock = jest.fn();
-                // Act
-                expect(
-                    () => expect(spy).toHaveBeenCalledOnce()
-                ).toThrow()
-                expect(
-                    () => expect(mock).toHaveBeenCalledOnce()
-                ).toThrow()
-                // Assert
-            });
-            it(`should throw if a jasmine spy or jest mock was called > once`, async () => {
-                // Arrange
-                const
-                    spy = jasmine.createSpy("jasmineSpy"),
-                    mock = jest.fn(),
-                    howMany = faker.random.number({ min: 2, max: 10 });
-                for (let i = 0; i < howMany; i++) {
-                    spy();
+            describe(`when jest mock has been called once`, () => {
+                it(`should pass`, async () => {
+                    // Arrange
+                    const
+                        mock = jest.fn();
+                    // Act
                     mock();
-                }
-                // Act
-                expect(
-                    () => expect(spy).toHaveBeenCalledOnce()
-                ).toThrow()
-                expect(
-                    () => expect(mock).toHaveBeenCalledOnce()
-                ).toThrow()
-                // Assert
+                    expect(
+                        () => expect(mock).toHaveBeenCalledOnce()
+                    ).not.toThrow()
+                    // Assert
+                });
+
+                describe(`and negated`, () => {
+                    it(`should fail`, async () => {
+                        // Arrange
+                        const
+                            mock = jest.fn();
+                        // Act
+                        mock();
+                        expect(
+                            () => expect(mock).not.toHaveBeenCalledOnce()
+                        ).toThrow()
+                        // Assert
+                    });
+                });
+            });
+            describe(`when jasmine spy has been called once`, () => {
+                it(`should pass`, async () => {
+                    // Arrange
+                    const
+                        spy = jasmine.createSpy("jasmineSpy");
+                    // Act
+                    spy();
+                    expect(
+                        () => expect(spy).toHaveBeenCalledOnce()
+                    ).not.toThrow()
+                    // Assert
+                });
+                describe(`and negated`, () => {
+                    it(`should fail`, async () => {
+                        // Arrange
+                        const
+                            spy = jasmine.createSpy("jasmineSpy");
+                        // Act
+                        spy();
+                        expect(
+                            () => expect(spy).not.toHaveBeenCalledOnce()
+                        ).toThrow()
+                        // Assert
+                    });
+                });
+            });
+            describe(`when jest mock has not been called at all`, () => {
+                it(`should fail`, async () => {
+                    // Arrange
+                    const
+                        mock = jest.fn();
+                    // Act
+                    expect(
+                        () => expect(mock).toHaveBeenCalledOnce()
+                    ).toThrow()
+                    // Assert
+                });
+
+                describe(`and negated`, () => {
+                    it(`should pass`, async () => {
+                        // Arrange
+                        const
+                            mock = jest.fn();
+                        // Act
+                        expect(
+                            () => expect(mock).not.toHaveBeenCalledOnce()
+                        ).not.toThrow()
+                        // Assert
+                    });
+                });
+            });
+            describe(`when jasmine spy has not been called at all`, () => {
+                it(`should fail`, async () => {
+                    // Arrange
+                    const
+                        spy = jasmine.createSpy("jasmineSpy");
+                    // Act
+                    expect(
+                        () => expect(spy).toHaveBeenCalledOnce()
+                    ).toThrow()
+                    // Assert
+                });
+                describe(`and negated`, () => {
+                    it(`should pass`, async () => {
+                        // Arrange
+                        const
+                            spy = jasmine.createSpy("jasmineSpy");
+                        // Act
+                        expect(
+                            () => expect(spy).not.toHaveBeenCalledOnce()
+                        ).not.toThrow()
+                        // Assert
+                    });
+                });
+            });
+
+            describe(`when jest mock has been called > once`, () => {
+                it(`should pass`, async () => {
+                    // Arrange
+                    const
+                        mock = jest.fn();
+                    // Act
+                    mock();
+                    mock();
+                    expect(
+                        () => expect(mock).toHaveBeenCalledOnce()
+                    ).toThrow()
+                    // Assert
+                });
+
+                describe(`and negated`, () => {
+                    it(`should fail`, async () => {
+                        // Arrange
+                        const
+                            mock = jest.fn();
+                        // Act
+                        mock();
+                        mock();
+                        expect(
+                            () => expect(mock).not.toHaveBeenCalledOnce()
+                        ).not.toThrow()
+                        // Assert
+                    });
+                });
+            });
+
+            describe(`when jasmine spy has been called > once`, () => {
+                it(`should fail`, async () => {
+                    // Arrange
+                    const
+                        spy = jasmine.createSpy("jasmineSpy");
+                    // Act
+                    spy();
+                    spy();
+                    expect(
+                        () => expect(spy).toHaveBeenCalledOnce()
+                    ).toThrow()
+                    // Assert
+                });
+                describe(`and negated`, () => {
+                    it(`should pass`, async () => {
+                        // Arrange
+                        const
+                            spy = jasmine.createSpy("jasmineSpy");
+                        // Act
+                        spy();
+                        spy();
+                        expect(
+                            () => expect(spy).not.toHaveBeenCalledOnce()
+                        ).not.toThrow()
+                        // Assert
+                    });
+                });
             });
         });
 
         describe(`toHaveBeenCalledOnceWith`, () => {
-            it(`should throw if the spy or mock was not called at all`, async () => {
-                // Arrange
-                const
-                    spy = jasmine.createSpy("jasmineSpy"),
-                    mock = jest.fn();
-                // Act
-                expect(() => expect(spy).toHaveBeenCalledOnceWith(1))
-                    .toThrow();
-                expect(() => expect(mock).toHaveBeenCalledOnceWith(1))
-                    .toThrow();
-                // Assert
-            });
-            it(`should throw if the spy or mock was called, but not with the required args`, async () => {
-                // Arrange
-                const
-                    spy = jasmine.createSpy("jasmineSpy"),
-                    mock = jest.fn();
-                spy(1, 2, 3);
-                mock("a", "b", "c");
-                // Act
-                expect(() => expect(spy).toHaveBeenCalledOnceWith(4, 5, 6))
-                    .toThrow();
-                expect(() => expect(mock).toHaveBeenCalledOnceWith("e", "f", "g"))
-                    .toThrow();
-                // Assert
-            });
+            describe(`when the spy or mock was not called at all`, () => {
+                it(`should fail`, async () => {
+                    // Arrange
+                    const
+                        spy = jasmine.createSpy("jasmineSpy"),
+                        mock = jest.fn();
+                    // Act
+                    expect(() => expect(spy).toHaveBeenCalledOnceWith(1))
+                        .toThrow();
+                    expect(() => expect(mock).toHaveBeenCalledOnceWith(1))
+                        .toThrow();
+                    // Assert
+                });
 
-            it(`should not throw if there was a single matching call`, async () => {
-                // Arrange
-                const
-                    spy = jasmine.createSpy("jasmineSpy"),
-                    mock = jest.fn();
-                spy(1, 2, 3);
-                spy(4, 5, 6);
-                mock("e", "f", "g");
-                mock("a", "b", "c");
-                // Act
-                expect(() => expect(spy).toHaveBeenCalledOnceWith(4, 5, 6))
-                    .not.toThrow();
-                expect(() => expect(mock).toHaveBeenCalledOnceWith("e", "f", "g"))
-                    .not.toThrow();
-                // Assert
+                describe(`and negated`, () => {
+                    it(`should pass`, async () => {
+                        // Arrange
+                        const
+                            spy = jasmine.createSpy("jasmineSpy"),
+                            mock = jest.fn();
+                        // Act
+                        expect(() => expect(spy).not.toHaveBeenCalledOnceWith(1))
+                            .not.toThrow();
+                        expect(() => expect(mock).not.toHaveBeenCalledOnceWith(1))
+                            .not.toThrow();
+                        // Assert
+                    });
+                });
             });
+            describe(`when spy or mock called with unexpected arguments`, () => {
+                it(`should fail`, async () => {
+                    // Arrange
+                    const
+                        spy = jasmine.createSpy("jasmineSpy"),
+                        mock = jest.fn();
+                    spy(1, 2, 3);
+                    mock("a", "b", "c");
+                    // Act
+                    expect(() => expect(spy).toHaveBeenCalledOnceWith(4, 5, 6))
+                        .toThrow();
+                    expect(() => expect(mock).toHaveBeenCalledOnceWith("e", "f", "g"))
+                        .toThrow();
+                    // Assert
+                });
 
-            it(`should throw if there was > 1 matching call`, async () => {
-                // Arrange
-                const
-                    spy = jasmine.createSpy("jasmineSpy"),
-                    mock = jest.fn();
-                spy(4, 5, 6);
-                spy(1, 2, 3);
-                spy(4, 5, 6);
-                mock("e", "f", "g");
-                mock("a", "b", "c");
-                mock("e", "f", "g");
-                // Act
-                expect(() => expect(spy).toHaveBeenCalledOnceWith(4, 5, 6))
-                    .toThrow();
-                expect(() => expect(mock).toHaveBeenCalledOnceWith("e", "f", "g"))
-                    .toThrow();
-                // Assert
+                describe(`and negated`, () => {
+                    it(`should pass`, async () => {
+                        // Arrange
+                        const
+                            spy = jasmine.createSpy("jasmineSpy"),
+                            mock = jest.fn();
+                        spy(1, 2, 3);
+                        mock("a", "b", "c");
+                        // Act
+                        expect(() => expect(spy).not.toHaveBeenCalledOnceWith(4, 5, 6))
+                            .not.toThrow();
+                        expect(() => expect(mock).not.toHaveBeenCalledOnceWith("e", "f", "g"))
+                            .not.toThrow();
+                        // Assert
+                    });
+                });
             });
+            describe(`when there is a single matching call`, () => {
+                it(`should pass`, async () => {
+                    // Arrange
+                    const
+                        spy = jasmine.createSpy("jasmineSpy"),
+                        mock = jest.fn();
+                    spy(1, 2, 3);
+                    spy(4, 5, 6);
+                    mock("e", "f", "g");
+                    mock("a", "b", "c");
+                    // Act
+                    expect(() => expect(spy).toHaveBeenCalledOnceWith(4, 5, 6))
+                        .not.toThrow();
+                    expect(() => expect(mock).toHaveBeenCalledOnceWith("e", "f", "g"))
+                        .not.toThrow();
+                    // Assert
+                });
 
-            it(`should do regex matching if it encounters a positionally matched string arg with regex expectation`,
-                async () => {
+                describe(`and negated`, () => {
+                    it(`should fail`, async () => {
+                        // Arrange
+                        const
+                            spy = jasmine.createSpy("jasmineSpy"),
+                            mock = jest.fn();
+                        spy(1, 2, 3);
+                        spy(4, 5, 6);
+                        mock("e", "f", "g");
+                        mock("a", "b", "c");
+                        // Act
+                        expect(() => expect(spy).not.toHaveBeenCalledOnceWith(4, 5, 6))
+                            .toThrow();
+                        expect(() => expect(mock).not.toHaveBeenCalledOnceWith("e", "f", "g"))
+                            .toThrow();
+                        // Assert
+                    });
+                });
+            });
+            describe(`when there is > 1 matching call`, () => {
+                it(`should fail`, async () => {
+                    // Arrange
+                    const
+                        spy = jasmine.createSpy("jasmineSpy"),
+                        mock = jest.fn();
+                    spy(4, 5, 6);
+                    spy(1, 2, 3);
+                    spy(4, 5, 6);
+                    mock("e", "f", "g");
+                    mock("a", "b", "c");
+                    mock("e", "f", "g");
+                    // Act
+                    expect(() => expect(spy).toHaveBeenCalledOnceWith(4, 5, 6))
+                        .toThrow();
+                    expect(() => expect(mock).toHaveBeenCalledOnceWith("e", "f", "g"))
+                        .toThrow();
+                    // Assert
+                });
+
+                describe(`and negated`, () => {
+                    it(`should pass`, async () => {
+                        // Arrange
+                        const
+                            spy = jasmine.createSpy("jasmineSpy"),
+                            mock = jest.fn();
+                        spy(4, 5, 6);
+                        spy(1, 2, 3);
+                        spy(4, 5, 6);
+                        mock("e", "f", "g");
+                        mock("a", "b", "c");
+                        mock("e", "f", "g");
+                        // Act
+                        expect(() => expect(spy).not.toHaveBeenCalledOnceWith(4, 5, 6))
+                            .not.toThrow();
+                        expect(() => expect(mock).not.toHaveBeenCalledOnceWith("e", "f", "g"))
+                            .not.toThrow();
+                        // Assert
+                    });
+                });
+            });
+            describe(`given a regex expectation paired with a matched string argument`, () => {
+                it(`should pass`, async () => {
                     // Arrange
                     const
                         spy = jasmine.createSpy("someSpy"),
@@ -282,11 +602,38 @@ describe(`expect-even-more-jest`, () => {
                     spy(message);
                     mock(message);
                     // Assert
-                    expect(spy)
-                        .toHaveBeenCalledOnceWith(/this is an error/i);
-                    expect(mock)
-                        .toHaveBeenCalledOnceWith(/this is an error/i);
+                    expect(() =>
+                        expect(spy)
+                            .toHaveBeenCalledOnceWith(/this is an error/i)
+                    ).not.toThrow();
+                    expect(() =>
+                        expect(mock)
+                            .toHaveBeenCalledOnceWith(/this is an error/i)
+                    ).not.toThrow();
                 });
+                
+                describe(`and negated`, () => {
+                    it(`should fail`, async () => {
+                        // Arrange
+                        const
+                            spy = jasmine.createSpy("someSpy"),
+                            mock = jest.fn(),
+                            message = "Hello there! This is an error, wot!";
+                        // Act
+                        spy(message);
+                        mock(message);
+                        // Assert
+                        expect(() =>
+                            expect(spy)
+                                .not.toHaveBeenCalledOnceWith(/this is an error/i)
+                        ).toThrow();
+                        expect(() =>
+                            expect(mock)
+                                .not.toHaveBeenCalledOnceWith(/this is an error/i)
+                        ).toThrow();
+                    });
+                });
+            });
         });
     });
 
@@ -305,7 +652,7 @@ describe(`expect-even-more-jest`, () => {
                 }).toBePromiseLike();
                 // Assert
             });
-            it(`should fail for something which is not a promise (ie, a value)`, async () => {
+            it(`should fail for something which is not a promise(ie, a value)`, async () => {
                 // Arrange
                 // Act
                 expect(1).not.toBePromiseLike();
@@ -319,8 +666,7 @@ describe(`expect-even-more-jest`, () => {
 
         // difficult to test, so I have to do positive cases from both sides :/
         describe(`toBeCompleted`, () => {
-            it(`should not throw when negated if the promise hasn't been resolved or rejected`, async () => {
-                // Arrange
+            it(`should not throw when negated if the promise hasn't been resolved or rejected`, async () => {                // Arrange
                 const promise = new Promise(() => {
                     // intentionally left blank
                 });
