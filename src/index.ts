@@ -589,7 +589,7 @@ function debugReceived(
     if (received.length) {
         parts.push.apply(parts, [
             ` received call${ received.length === 1 ? "" : "s" }:\n (`,
-            result.join(`) (`),
+            result.join(`)\n (`),
             ")"
         ]);
     } else {
