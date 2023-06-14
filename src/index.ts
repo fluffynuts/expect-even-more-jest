@@ -26,6 +26,7 @@ declare global {
             // mocks & spies
             toHaveBeenCalledOnce(): void;
             toHaveBeenCalledOnceWith(...args: any[]): void;
+            toHaveBeenCalledWith(...args: any[]): void;
             toHaveBeenCalledOnceWithNoArgs(): void;
 
             // promises
@@ -121,7 +122,7 @@ function assertHasKeys(
     assert((() => {
         const objectKeys = Object.keys(obj);
         return keys.reduce((acc, cur) =>
-            acc && objectKeys.indexOf(cur) > -1,
+                acc && objectKeys.indexOf(cur) > -1,
             true);
     })(), msg);
     return msg;
@@ -260,7 +261,7 @@ beforeAll(() => {
                     actual.length === expected.length,
                     msg);
                 assert(actual.reduce((acc, cur) =>
-                    acc && expected.indexOf(cur) > -1,
+                        acc && expected.indexOf(cur) > -1,
                     true), msg);
                 return msg;
             });
@@ -346,9 +347,42 @@ beforeAll(() => {
                 return () => `expected${ notFor(this) }to have found exactly 1 call with no arguments`;
             });
         },
+        toHaveBeenCalledWith(actual: Mock | jasmine.Spy, ...args: any[]) {
+            return runAssertions(this, () => {
+                const receivedArgs = fetchSpyOrMockArgs(actual);
+                const matching = receivedArgs.filter(
+                    received => {
+                        try {
+                            expect(received.length)
+                                .toEqual(args.length);
+                            received.forEach((r: any, idx: number) => {
+                                const test = args[idx];
+                                if (typeof r === "string" && test instanceof RegExp) {
+                                    expect(r).toMatch(test);
+                                } else {
+                                    expect(r).toEqual(test);
+                                }
+                            });
+                            return true;
+                        } catch (e) {
+                            return false;
+                        }
+                    });
+                assert(
+                    receivedArgs.length > 0,
+                    `expected${ notFor(this) }to have been called, but it was not\n${debugReceived(args, receivedArgs)}`
+                );
+                assert(
+                    matching.length > 0,
+                    `expected${ notFor(this) }to have received at least one matching call, but none were found\n${ debugReceived(args, receivedArgs) }`
+                );
+                return () => `expected${ notFor(this) }to have been called with ${ args }\n${ debugReceived(args, receivedArgs) }`;
+            });
+        },
         toHaveBeenCalledOnceWith(actual: Mock | jasmine.Spy, ...args: any[]) {
             return runAssertions(this, () => {
                 if (args.length === 0) {
+                    // tslint:disable-next-line:no-console
                     console.warn(`
 'toHaveBeenCalledOnceWith' was invoked with no arguments.
 If this is by design, rather use 'toHaveBeenCalledOnceWithNoArgs()'.`.trim()
@@ -375,9 +409,9 @@ If this is by design, rather use 'toHaveBeenCalledOnceWithNoArgs()'.`.trim()
                     });
                 assert(
                     matching.length === 1,
-                    `expected${ notFor(this) }to have found exactly one matching call, but found ${ matching.length }`
+                    `expected${ notFor(this) }to have found exactly one matching call, but found ${ matching.length }\n${ debugReceived(args, receivedArgs) }`
                 );
-                return () => `expected${ notFor(this) }to have been called once with ${ args }`;
+                return () => `expected${ notFor(this) }to have been called once with ${ args }\n${ debugReceived(args, receivedArgs) }`;
             });
         },
         async toBeCompleted(actual: Promise<any>) {
@@ -539,3 +573,79 @@ export function fetchSpyOrMockArgs(subject: Mock | jasmine.Spy | Function): any[
     }
 }
 
+function debugReceived(
+    expected: any[],
+    received: any[][]
+): string {
+    const result = [] as string[];
+    for (const r of received) {
+        result.push(r.map(makePrintableArg).join(","));
+    }
+    const parts = [
+        ` expected call:\n (`,
+        expected.map(makePrintableArg).join(","),
+        `)\n`
+    ];
+    if (received.length) {
+        parts.push.apply(parts, [
+            ` received call${ received.length === 1 ? "" : "s" }:\n (`,
+            result.join(`) (`),
+            ")"
+        ]);
+    } else {
+        parts.push(` received calls: none`);
+    }
+    return parts.join("");
+}
+
+const argPrinters = [
+    nullPrinter,
+    undefinedPrinter,
+    numericPrinter,
+    stringPrinter,
+    objectPrinter
+];
+
+type Optional<T> = T | undefined;
+
+function nullPrinter(value: any): Optional<string> {
+    if (value === null) {
+        return "null";
+    }
+}
+
+function undefinedPrinter(value: any): Optional<string> {
+    if (value === undefined) {
+        return "undefined";
+    }
+}
+
+function numericPrinter(value: any): Optional<string> {
+    if (typeof value === typeof 1) {
+        return `${ value }`;
+    }
+}
+
+function stringPrinter(value: any): Optional<string> {
+    if (typeof value === typeof "") {
+        return `"${ value.replace(/"/, "\\") }"`;
+    }
+}
+
+function objectPrinter(value: any): Optional<string> {
+    try {
+        return JSON.stringify(value);
+    } catch (e) {
+        return `${ value }`;
+    }
+}
+
+function makePrintableArg(arg: any): string {
+    for (const printer of argPrinters) {
+        const potentialResult = printer(arg);
+        if (potentialResult !== undefined) {
+            return potentialResult;
+        }
+    }
+    throw new Error(`No arg printer installed for ${ arg }`);
+}

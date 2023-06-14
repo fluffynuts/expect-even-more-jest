@@ -40,7 +40,7 @@
     "ts-jest": "^26.0.0",
     "tslint": "^6.1.2",
     "typescript": "^3.9.3",
-    "zarro": "^1.91.0"
+    "zarro": "^1.130.0"
   },
   "dependencies": {
     "expect-more-jest": "^5.2.0",

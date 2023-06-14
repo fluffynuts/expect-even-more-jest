@@ -207,7 +207,7 @@ describe(`mocks and spies`, () => {
                 expect(() => expect(spy).toHaveBeenCalledOnceWith(4, 5, 6))
                     .toThrow();
                 expect(() => expect(mock).toHaveBeenCalledOnceWith("e", "f", "g"))
-                    .toThrow();
+                    .toThrow(/"e","f","g".*"a","b","c"/s);
                 // Assert
             });
 
