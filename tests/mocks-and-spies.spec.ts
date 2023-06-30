@@ -425,5 +425,22 @@ describe(`mocks and spies`, () => {
             });
         });
     });
+
+    describe(`wild issues`, () => {
+        it(`should be able to print for jasmine.any(Function)`, async () => {
+            // Arrange
+            const obj = {
+                fn(i: any) {
+                    // moo
+                }
+            };
+            spyOn(obj, "fn");
+            // Act
+            obj.fn(() => {});
+            // Assert
+            expect(obj.fn)
+                .toHaveBeenCalledOnceWith(jasmine.any(Function));
+        });
+    });
 });
 

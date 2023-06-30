@@ -603,7 +603,8 @@ const argPrinters = [
     undefinedPrinter,
     numericPrinter,
     stringPrinter,
-    objectPrinter
+    objectPrinter,
+    fallbackPrinter
 ];
 
 type Optional<T> = T | undefined;
@@ -638,6 +639,10 @@ function objectPrinter(value: any): Optional<string> {
     } catch (e) {
         return `${ value }`;
     }
+}
+
+function fallbackPrinter(value: any): string {
+    return `${value}`;
 }
 
 function makePrintableArg(arg: any): string {
