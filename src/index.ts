@@ -206,7 +206,7 @@ beforeAll(() => {
                 const matches = actual.filter(condition);
                 assert(matches.length === actual.length,
                     `Some elements don't match the provided condition:\n\n${
-                        matches.map(m => JSON.stringify(m)).join("\n")
+                        matches.map(m => prettyPrint(m)).join("\n")
                     }`);
                 return "Expected to find mismatches, but didn't";
             });
@@ -223,8 +223,8 @@ beforeAll(() => {
                 const mismatches = intersection.reduce(
                     (acc, cur) => {
                         if (!areEqual(actual[cur], expected[cur])) {
-                            acc.push(`expected ${ cur } to be ` +
-                                `${ JSON.stringify(expected[cur]) } but got ${ JSON.stringify(actual[cur]) }`);
+                            acc.push(`expected ${ cur } to be \n` +
+                                `${ prettyPrint(expected[cur]) }\nbut got\n${ prettyPrint(actual[cur]) }`);
                         }
                         return acc;
                     }, [] as string[]);
@@ -553,8 +553,8 @@ function areEqual(
     if (!result && debug) {
         // tslint:disable-next-line:no-console
         console.debug(`areEqual mismatch:\n` +
-            `left:\n${ JSON.stringify(left) }\n` +
-            `right:${ JSON.stringify(right) }`);
+            `left:\n${ prettyPrint(left) }\n` +
+            `right:${ prettyPrint(right) }`);
     }
     return result;
 }
@@ -648,7 +648,7 @@ function stringPrinter(value: any): Optional<string> {
 
 function objectPrinter(value: any): Optional<string> {
     try {
-        return JSON.stringify(value);
+        return prettyPrint(value);
     } catch (e) {
         return `${ value }`;
     }
