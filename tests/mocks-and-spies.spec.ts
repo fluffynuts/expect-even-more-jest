@@ -436,11 +436,52 @@ describe(`mocks and spies`, () => {
             };
             spyOn(obj, "fn");
             // Act
-            obj.fn(() => {});
+            obj.fn(() => {
+            });
             // Assert
             expect(obj.fn)
                 .toHaveBeenCalledOnceWith(jasmine.any(Function));
         });
     });
-});
+
+    describe(`toThrowMatching`, () => {
+        it(`should match via the provided function`, async () => {
+            // Arrange
+            // Act
+            expect(() => {
+                expect(() => {
+                    throw new Error("foo bar")
+                })
+                    .toThrowMatching(
+                        e => e instanceof Error &&
+                            e.message.indexOf("foo") > -1 &&
+                            e.message.indexOf("bar") > -1
+                    );
+            }).not.toThrow();
+
+            expect(() => {
+                expect(() => {
+                    throw new Error("cow beef")
+                }).toThrowMatching(
+                    e => e instanceof Error &&
+                        e.message.indexOf("foo") > -1 &&
+                        e.message.indexOf("bar") > -1
+                );
+            }).toThrow();
+
+            expect(() => {
+                expect(() => {
+                    return 10;
+                }).not.toThrowMatching(
+                    e => e instanceof Error &&
+                        e.message.indexOf("foo") > -1 &&
+                        e.message.indexOf("bar") > -1
+                );
+            }).toThrow();
+            // Assert
+        });
+    })
+    ;
+})
+;
 

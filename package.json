@@ -7,7 +7,8 @@
     "dist/**/*"
   ],
   "scripts": {
-    "test": "jest",
+    "test": "jest --no-cache",
+    "autotest": "jest -w --no-cache",
     "prebuild": "rimraf dist",
     "build": "tsc",
     "lint": "tslint -p .",
@@ -37,6 +38,7 @@
     "@types/node": "^14.0.5",
     "faker": "^4.1.0",
     "filesystem-sandbox": "^1.11.0",
+    "nodemon": "^3.0.1",
     "ts-jest": "^26.0.0",
     "tslint": "^6.1.2",
     "typescript": "^3.9.3",

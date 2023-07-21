@@ -1,7 +1,6 @@
 import fs from "fs";
 import Mock = jest.Mock;
 import "expect-more-jest";
-// import { isEqual as _isEqual } from "lodash";
 import _isEqual from "lodash.isequal";
 
 export function sleep(ms: number): Promise<void> {
@@ -48,6 +47,8 @@ declare global {
             // DOM
             toHaveAttribute(attrib: string, expected?: string): void;
 
+            // errors
+            toThrowMatching(matcher: (e: string | Error) => boolean): void;
         }
     }
 }
@@ -370,7 +371,7 @@ beforeAll(() => {
                     });
                 assert(
                     receivedArgs.length > 0,
-                    `expected${ notFor(this) }to have been called, but it was not\n${debugReceived(args, receivedArgs)}`
+                    `expected${ notFor(this) }to have been called, but it was not\n${ debugReceived(args, receivedArgs) }`
                 );
                 assert(
                     matching.length > 0,
@@ -520,6 +521,18 @@ If this is by design, rather use 'toHaveBeenCalledOnceWithNoArgs()'.`.trim()
                 }
                 return msg;
             });
+        },
+        toThrowMatching(actual: () => void, matcher: (e: string | Error) => boolean) {
+            return runAssertions(this, () => {
+                try {
+                    actual();
+                    return () => `Expected function to throw an error, but none was thrown`;
+                } catch (e) {
+                    const msg = () => `Expected function to throw error matching ${ matcher }\ninstead, it threw: ${ e }`;
+                    assert(matcher(e), msg);
+                    return msg;
+                }
+            });
         }
     });
 });
@@ -579,11 +592,11 @@ function debugReceived(
 ): string {
     const result = [] as string[];
     for (const r of received) {
-        result.push(r.map(makePrintableArg).join(","));
+        result.push(r.map(stringify).join(","));
     }
     const parts = [
         ` expected call:\n (`,
-        expected.map(makePrintableArg).join(","),
+        expected.map(stringify).join(","),
         `)\n`
     ];
     if (received.length) {
@@ -642,10 +655,10 @@ function objectPrinter(value: any): Optional<string> {
 }
 
 function fallbackPrinter(value: any): string {
-    return `${value}`;
+    return `${ value }`;
 }
 
-function makePrintableArg(arg: any): string {
+export function stringify(arg: any): string {
     for (const printer of argPrinters) {
         const potentialResult = printer(arg);
         if (potentialResult !== undefined) {
