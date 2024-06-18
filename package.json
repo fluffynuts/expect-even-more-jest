@@ -12,7 +12,6 @@
     "prebuild": "rimraf dist",
     "build": "tsc",
     "lint": "tslint -p .",
-    "increment-package-version-beta": "cross-env VERSION_INCREMENT_STRATEGY=patch run-s \"zarro increment-package-json-version\"",
     "prerelease-beta": "run-s build test",
     "release-beta": "cross-env BETA=1 VERSION_INCREMENT_STRATEGY=patch run-s \"zarro release-npm\"",
     "prerelease": "run-s build test",
@@ -46,7 +45,7 @@
     "ts-jest": "^29.1.4",
     "tslint": "^6.1.2",
     "typescript": "^5.4.5",
-    "zarro": "^1.130.0"
+    "zarro": "^1.178.0"
   },
   "dependencies": {
     "expect-more-jest": "^5.2.0",
