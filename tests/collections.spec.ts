@@ -1,3 +1,5 @@
+// noinspection UnnecessaryLocalVariableJS
+
 import "../src/index";
 import faker from "faker";
 

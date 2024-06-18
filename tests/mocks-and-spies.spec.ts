@@ -437,6 +437,7 @@ describe(`mocks and spies`, () => {
             spyOn(obj, "fn");
             // Act
             obj.fn(() => {
+                // intentionally left blank
             });
             // Assert
             expect(obj.fn)
