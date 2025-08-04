@@ -104,3 +104,4 @@ dist
 .tern-port
 __sandboxes__
 .idea
+.jest-cache
