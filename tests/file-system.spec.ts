@@ -1,6 +1,6 @@
 import "../src/index";
 import { Sandbox } from "filesystem-sandbox";
-import faker from "faker";
+import { fakerEN as faker } from "@faker-js/faker";
 
 describe(`file system`, () => {
     describe(`toBeFile`, () => {
@@ -8,10 +8,10 @@ describe(`file system`, () => {
             // Arrange
             const
                 sandbox = await Sandbox.create(),
-                filename = faker.random.alphaNumeric(10),
-                another = faker.random.alphaNumeric(10),
-                folder = faker.random.alphaNumeric(10);
-            await sandbox.writeFile(filename, faker.random.words());
+                filename = faker.string.alphanumeric(10),
+                another = faker.string.alphanumeric(10),
+                folder = faker.string.alphanumeric(10);
+            await sandbox.writeFile(filename, faker.word.words());
             await sandbox.mkdir(folder);
             // Act
             expect(sandbox.fullPathFor(filename))
@@ -29,10 +29,10 @@ describe(`file system`, () => {
             // Arrange
             const
                 sandbox = await Sandbox.create(),
-                filename = faker.random.alphaNumeric(10),
-                another = faker.random.alphaNumeric(10),
-                folder = faker.random.alphaNumeric(10);
-            await sandbox.writeFile(filename, faker.random.words());
+                filename = faker.string.alphanumeric(10),
+                another = faker.string.alphanumeric(10),
+                folder = faker.string.alphanumeric(10);
+            await sandbox.writeFile(filename, faker.word.words());
             await sandbox.mkdir(folder);
             // Act
             expect(sandbox.fullPathFor(filename))

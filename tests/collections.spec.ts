@@ -1,7 +1,7 @@
 // noinspection UnnecessaryLocalVariableJS
 
 import "../src/index";
-import faker from "faker";
+import { fakerEN as faker} from "@faker-js/faker";
 
 describe(`collections`, () => {
     describe(`toBeEquivalentTo`, () => {
@@ -41,11 +41,11 @@ describe(`collections`, () => {
     describe(`toHaveKey`, () => {
         it(`should fail when object does not exist`, async () => {
             // Arrange
-            const obj = faker.random.arrayElement([ null, undefined ]);
+            const obj = faker.helpers.arrayElement([ null, undefined ]);
             // Act
             expect(() =>
                 expect(obj)
-                    .toHaveKey(faker.random.alphaNumeric(1))
+                    .toHaveKey(faker.string.alphanumeric(1))
             ).toThrow();
             // Assert
         });
@@ -54,8 +54,8 @@ describe(`collections`, () => {
             // Arrange
             const
                 obj = {} as any,
-                key = faker.random.alphaNumeric(10),
-                value = faker.random.alphaNumeric(10);
+                key = faker.string.alphanumeric(10),
+                value = faker.string.alphanumeric(10);
             obj[key] = value;
             // Act
             expect(obj)
@@ -67,9 +67,9 @@ describe(`collections`, () => {
             // Arrange
             const
                 obj = {} as any,
-                key = faker.random.alphaNumeric(10),
-                otherKey = faker.random.alphaNumeric(10),
-                value = faker.random.alphaNumeric(10);
+                key = faker.string.alphanumeric(10),
+                otherKey = faker.string.alphanumeric(10),
+                value = faker.string.alphanumeric(10);
             obj[key] = value;
             // Act
             expect(() => {
@@ -84,11 +84,11 @@ describe(`collections`, () => {
     describe(`toHaveKeys`, () => {
         it(`should fail when object does not exist`, async () => {
             // Arrange
-            const obj = faker.random.arrayElement([ null, undefined ]);
+            const obj = faker.helpers.arrayElement([ null, undefined ]);
             // Act
             expect(() =>
                 expect(obj)
-                    .toHaveKeys(faker.random.alphaNumeric(1))
+                    .toHaveKeys(faker.string.alphanumeric(1))
             ).toThrow();
             // Assert
         });
@@ -97,8 +97,8 @@ describe(`collections`, () => {
             // Arrange
             const
                 obj = {} as any,
-                key = faker.random.alphaNumeric(10),
-                value = faker.random.alphaNumeric(10);
+                key = faker.string.alphanumeric(10),
+                value = faker.string.alphanumeric(10);
             obj[key] = value;
             // Act
             expect(obj)
@@ -110,9 +110,9 @@ describe(`collections`, () => {
             // Arrange
             const
                 obj = {} as any,
-                key = faker.random.alphaNumeric(10),
-                otherKey = faker.random.alphaNumeric(10),
-                value = faker.random.alphaNumeric(10);
+                key = faker.string.alphanumeric(10),
+                otherKey = faker.string.alphanumeric(10),
+                value = faker.string.alphanumeric(10);
             obj[key] = value;
             // Act
             expect(() => {
@@ -128,9 +128,9 @@ describe(`collections`, () => {
             // Arrange
             const
                 obj = {} as any,
-                key = faker.random.alphaNumeric(10),
-                otherKey = faker.random.alphaNumeric(10),
-                value = faker.random.alphaNumeric(10);
+                key = faker.string.alphanumeric(10),
+                otherKey = faker.string.alphanumeric(10),
+                value = faker.string.alphanumeric(10);
             obj[key] = value;
             obj[otherKey] = value;
             // Act
