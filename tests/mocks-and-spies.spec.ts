@@ -443,6 +443,38 @@ describe(`mocks and spies`, () => {
             expect(obj.fn)
                 .toHaveBeenCalledOnceWith(jasmine.any(Function));
         });
+        it(`should be able to print for expect.any(Function)`, async () => {
+            // Arrange
+            const obj = {
+                fn(i: any) {
+                    // moo
+                }
+            };
+            spyOn(obj, "fn");
+            // Act
+            obj.fn(() => {
+                // intentionally left blank
+            });
+            // Assert
+            expect(obj.fn)
+                .toHaveBeenCalledOnceWith(expect.any(Function));
+        });
+        it(`should be able to print for expect.any(Function) [jest fn]`, async () => {
+            // Arrange
+            const obj = {
+                fn(i: any) {
+                    // moo
+                }
+            };
+            jest.spyOn(obj, "fn").mockReturnValue();
+            // Act
+            obj.fn(() => {
+                // intentionally left blank
+            });
+            // Assert
+            expect(obj.fn)
+                .toHaveBeenCalledOnceWith(expect.any(Function));
+        });
     });
 
     describe(`toThrowMatching`, () => {

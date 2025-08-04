@@ -156,6 +156,7 @@ module.exports = {
   // testResultsProcessor: undefined,
 
   // This option allows use of a custom test runner
+  // we use the jasmine runner so we can verify that both jest and jasmine spies work
   testRunner: "jasmine2",
 
   // This option sets the URL for the jsdom environment. It is reflected in properties such as location.href
