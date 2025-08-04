@@ -1,6 +1,6 @@
 {
   "name": "expect-even-more-jest",
-  "version": "1.19.0",
+  "version": "1.20.0",
   "description": "expect-more-jest with even more stuff",
   "main": "dist/index.js",
   "files": [
