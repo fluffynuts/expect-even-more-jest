@@ -243,7 +243,7 @@ describe(`values`, () => {
             null,
             undefined
         ].forEach(testCase => {
-            describe(`given '${ testCase }'`, () => {
+            describe(`given '${testCase}'`, () => {
                 it(`should pass`, async () => {
                     // Arrange
                     // Act
@@ -265,6 +265,46 @@ describe(`values`, () => {
                     });
                 });
             });
+        });
+    });
+
+    describe(`toHaveData`, () => {
+        it(`should test the objects sans their functions`, async () => {
+            // Arrange
+            const
+                first = {
+                    id: 1,
+                    get name() {
+                        return "Bob"
+                    },
+                    work() {
+                        console.log("working hard (1)!")
+                    }
+                },
+                second = {
+                    id: 1,
+                    get name() {
+                        return "Bob"
+                    },
+                    work() {
+                        console.log("working hard (2)!")
+                    }
+                },
+                third = {
+                    id: 2,
+                    get name() {
+                        return "Sally"
+                    },
+                    work() {
+                        console.log("working hard (3)!")
+                    }
+                };
+            // Act
+            expect(() => expect(second).toHaveData(first))
+                .not.toThrow();
+            expect(() => expect(second).toHaveData(third))
+                .toThrow();
+            // Assert
         });
     });
 });

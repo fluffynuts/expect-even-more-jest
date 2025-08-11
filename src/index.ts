@@ -70,6 +70,9 @@ declare global {
 
             // errors
             toThrowMatching(matcher: (e: string | Error) => boolean): void;
+
+            // data-matching
+            toHaveData<T extends object>(expected: T): void;
         }
     }
 }
@@ -187,8 +190,29 @@ function isEmptyOrWhitespace(value: string | null | undefined) {
         );
 }
 
+function stripAllFunctionsRecursive<T extends{[key: string]: any}>(from: T): T {
+    const result = { ...from };
+    for (const key of Object.keys(result)) {
+        if (typeof result[key] === "function") {
+            delete result[key];
+        }
+    }
+    return result;
+}
+
 beforeAll(() => {
     expect.extend({
+        toHaveData(actual: object, expected: object) {
+            return runAssertions(this, () => {
+                assert(!!expected, `Expected ${actual} to exist`);
+                const
+                    actualData = stripAllFunctionsRecursive(actual),
+                    expectedData = stripAllFunctionsRecursive(expected);
+                const msg = () => `Expected\n${JSON.stringify(actualData, null, 2)}\n${notFor(this).trimLeft()}to equal:\n${JSON.stringify(expectedData, null, 2)}`
+                assert(areEqual(actualData, expectedData), msg);
+                return msg;
+            });
+        },
         toBeEmptyOrWhitespace(actual: string | null | undefined) {
             return runAssertions(this, () => {
                 assert(isEmptyOrWhitespace(actual), `Expected '${actual}' to be empty or whitespace string`);
