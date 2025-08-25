@@ -206,12 +206,12 @@ beforeAll(() => {
         toBeVisible(actual: HTMLElement) {
             return runAssertions(this, () => {
                 const msg = () => `Expected '${ actual.outerHTML }'${ notFor(this) }to be visible`;
-                // TODO: this should probably be an assertion error
                 assert(!!actual, "actual does not exist");
+                const style = window.getComputedStyle(actual);
                 assert(
-                    actual.style.display !== "none" &&
-                    actual.style.visibility !== "hidden" &&
-                    actual.style.visibility !== "collapse" &&
+                    style.display !== "none" &&
+                    style.visibility !== "hidden" &&
+                    style.visibility !== "collapse" &&
                     !actual.hidden,
                     msg
                 );

@@ -50,6 +50,14 @@ describe(`dom nodes`, () => {
         it(`should assert element visibility`, async () => {
             // Arrange
             const
+                cssTag = HTMLElementBuilder.create("style")
+                    .withAttribute("type", "text/css")
+                    .withContent(`
+                        .ng-hide { display: none !important }
+                        `
+                    ).build();
+            document.head.appendChild(cssTag);
+            const
                 visibleEl = HTMLElementBuilder.buildDefault("div"),
                 displayNoneEl = HTMLElementBuilder.create("div")
                     .withAttribute("style", "display: none")
@@ -62,6 +70,9 @@ describe(`dom nodes`, () => {
                     .build(),
                 hiddenEl = HTMLElementBuilder.create("div")
                     .withProp(o => o.hidden = true)
+                    .build(),
+                angularHiddenEl = HTMLElementBuilder.create("div")
+                    .withClass("ng-hide")
                     .build();
             // Act
             expect(visibleEl)
@@ -73,6 +84,8 @@ describe(`dom nodes`, () => {
             expect(collapsedEl)
                 .not.toBeVisible();
             expect(hiddenEl)
+                .not.toBeVisible();
+            expect(angularHiddenEl)
                 .not.toBeVisible();
 
             expect(() =>
@@ -93,6 +106,10 @@ describe(`dom nodes`, () => {
             ).toThrow();
             expect(() =>
                 expect(hiddenEl)
+                    .toBeVisible()
+            ).toThrow();
+            expect(() =>
+                expect(angularHiddenEl)
                     .toBeVisible()
             ).toThrow();
 
@@ -149,6 +166,22 @@ describe(`dom nodes`, () => {
         ): HTMLElementBuilder {
             return this.withProp(
                 o => o.setAttribute(name, value)
+            );
+        }
+
+        public withClass(
+            name: string
+        ) {
+            return this.withProp(
+                o => o.classList.add(name)
+            );
+        }
+
+        public withContent(
+            content: string
+        ) {
+            return this.withProp(
+                o => o.innerHTML = content
             );
         }
 
