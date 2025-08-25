@@ -67,6 +67,7 @@ declare global {
 
             // DOM
             toHaveAttribute(attrib: string, expected?: string): void;
+            toBeVisible(): void;
 
             // errors
             toThrowMatching(matcher: (e: string | Error) => boolean): void;
@@ -202,6 +203,21 @@ function stripAllFunctionsRecursive<T extends{[key: string]: any}>(from: T): T {
 
 beforeAll(() => {
     expect.extend({
+        toBeVisible(actual: HTMLElement) {
+            return runAssertions(this, () => {
+                const msg = () => `Expected '${ actual.outerHTML }'${ notFor(this) }to be visible`;
+                // TODO: this should probably be an assertion error
+                assert(!!actual, "actual does not exist");
+                assert(
+                    actual.style.display !== "none" &&
+                    actual.style.visibility !== "hidden" &&
+                    actual.style.visibility !== "collapse" &&
+                    !actual.hidden,
+                    msg
+                );
+                return msg;
+            });
+        },
         toHaveData(actual: object, expected: object) {
             return runAssertions(this, () => {
                 assert(!!expected, `Expected ${actual} to exist`);
