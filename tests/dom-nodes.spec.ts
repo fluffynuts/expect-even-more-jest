@@ -73,7 +73,10 @@ describe(`dom nodes`, () => {
                     .build(),
                 angularHiddenEl = HTMLElementBuilder.create("div")
                     .withClass("ng-hide")
+                    .build(),
+                angularChild = HTMLElementBuilder.create("div")
                     .build();
+            angularHiddenEl.appendChild(angularChild);
             // Act
             expect(visibleEl)
                 .toBeVisible();
@@ -86,6 +89,8 @@ describe(`dom nodes`, () => {
             expect(hiddenEl)
                 .not.toBeVisible();
             expect(angularHiddenEl)
+                .not.toBeVisible();
+            expect(angularChild)
                 .not.toBeVisible();
 
             expect(() =>
@@ -110,6 +115,10 @@ describe(`dom nodes`, () => {
             ).toThrow();
             expect(() =>
                 expect(angularHiddenEl)
+                    .toBeVisible()
+            ).toThrow();
+            expect(() =>
+                expect(angularChild)
                     .toBeVisible()
             ).toThrow();
 

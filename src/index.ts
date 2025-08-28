@@ -67,6 +67,7 @@ declare global {
 
             // DOM
             toHaveAttribute(attrib: string, expected?: string): void;
+
             toBeVisible(): void;
 
             // errors
@@ -191,7 +192,7 @@ function isEmptyOrWhitespace(value: string | null | undefined) {
         );
 }
 
-function stripAllFunctionsRecursive<T extends{[key: string]: any}>(from: T): T {
+function stripAllFunctionsRecursive<T extends { [key: string]: any }>(from: T): T {
     const result = { ...from };
     for (const key of Object.keys(result)) {
         if (typeof result[key] === "function") {
@@ -201,20 +202,40 @@ function stripAllFunctionsRecursive<T extends{[key: string]: any}>(from: T): T {
     return result;
 }
 
+// to accurately check visibility of an element,
+// we have to traverse up the node tree - if
+// we get to a point where there's no more parentElement
+// and the nodes traversed are all visible, then the
+// queried element is visible.
+// if we don't do this, then window.getComputedStyle
+// won't take into account styles from parent elements,
+// so a hidden parent with a "visible" child will result
+// in a check on the child coming back as visible
+function isVisible(el: HTMLElement): boolean {
+    const style = window.getComputedStyle(el);
+    let thisElementIsVisible = false;
+    if (
+        style.display !== "none" &&
+        style.visibility !== "hidden" &&
+        style.visibility !== "collapse" &&
+        !el.hidden
+    ) {
+        thisElementIsVisible = true;
+    }
+
+    if (el.parentElement) {
+        return thisElementIsVisible && isVisible(el.parentElement);
+    }
+    return thisElementIsVisible;
+}
+
 beforeAll(() => {
     expect.extend({
         toBeVisible(actual: HTMLElement) {
             return runAssertions(this, () => {
-                const msg = () => `Expected '${ actual.outerHTML }'${ notFor(this) }to be visible`;
+                const msg = () => `Expected '${actual.outerHTML}'${notFor(this)}to be visible`;
                 assert(!!actual, "actual does not exist");
-                const style = window.getComputedStyle(actual);
-                assert(
-                    style.display !== "none" &&
-                    style.visibility !== "hidden" &&
-                    style.visibility !== "collapse" &&
-                    !actual.hidden,
-                    msg
-                );
+                assert(isVisible(actual), msg);
                 return msg;
             });
         },
