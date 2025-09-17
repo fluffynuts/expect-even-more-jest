@@ -126,6 +126,43 @@ describe(`dom nodes`, () => {
         });
     });
 
+    describe(`toBeDisabled`, () => {
+        [
+            "input",
+            "button",
+            "fieldset",
+            "optgroup",
+            "option",
+            "select",
+            "textarea"
+        ].forEach(tag => {
+            it(`should throw when html element not disabled`, async () => {
+                // Arrange
+                const el = HTMLElementBuilder.buildDefault(tag);
+                // Act
+                expect(() => {
+                    expect(el)
+                        .not.toBeDisabled();
+                }).not.toThrow();
+                expect(() => {
+                    expect(el)
+                        .toBeDisabled()
+                }).toThrow();
+                const input = el as HTMLInputElement;
+                input.disabled = true;
+                expect(() => {
+                    expect(el)
+                        .not.toBeDisabled();
+                }).toThrow();
+                expect(() => {
+                    expect(el)
+                        .toBeDisabled();
+                }).not.toThrow();
+                // Assert
+            });
+        });
+    });
+
     interface Dictionary<T> {
         [key: string]: T
     }

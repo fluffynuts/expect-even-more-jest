@@ -9,6 +9,14 @@ export function sleep(ms: number): Promise<void> {
 }
 
 export type Nullable<T> = (T | null);
+export type ElementsWhichCanBeDisabled =
+    HTMLInputElement |
+    HTMLButtonElement |
+    HTMLFieldSetElement |
+    HTMLOptGroupElement |
+    HTMLOptionElement |
+    HTMLSelectElement |
+    HTMLTextAreaElement;
 
 declare global {
     namespace jest {
@@ -69,6 +77,8 @@ declare global {
             toHaveAttribute(attrib: string, expected?: string): void;
 
             toBeVisible(): void;
+
+            toBeDisabled(): void;
 
             // errors
             toThrowMatching(matcher: (e: string | Error) => boolean): void;
@@ -231,6 +241,15 @@ function isVisible(el: HTMLElement): boolean {
 
 beforeAll(() => {
     expect.extend({
+        toBeDisabled(actual: ElementsWhichCanBeDisabled) {
+            return runAssertions(this, () => {
+                const msg = () => `Expected '${actual.outerHTML}'${notFor(this)}to be disabled`;
+                assert(!!actual, "actual does not exist");
+                assert(actual.disabled !== undefined, "actual does not support the .disabled property");
+                assert(actual.disabled, "actual should be disabled");
+                return msg;
+            });
+        },
         toBeVisible(actual: HTMLElement) {
             return runAssertions(this, () => {
                 const msg = () => `Expected '${actual.outerHTML}'${notFor(this)}to be visible`;
