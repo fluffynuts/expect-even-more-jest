@@ -212,6 +212,11 @@ function stripAllFunctionsRecursive<T extends { [key: string]: any }>(from: T): 
     return result;
 }
 
+export interface VisibilityResult {
+    isVisible: boolean;
+    message: string;
+}
+
 // to accurately check visibility of an element,
 // we have to traverse up the node tree - if
 // we get to a point where there's no more parentElement
@@ -221,9 +226,10 @@ function stripAllFunctionsRecursive<T extends { [key: string]: any }>(from: T): 
 // won't take into account styles from parent elements,
 // so a hidden parent with a "visible" child will result
 // in a check on the child coming back as visible
-function isVisible(el: HTMLElement): boolean {
+function isVisible(el: HTMLElement): VisibilityResult {
     const style = window.getComputedStyle(el);
     let thisElementIsVisible = false;
+    let message = "";
     if (
         style.display !== "none" &&
         style.visibility !== "hidden" &&
@@ -234,9 +240,19 @@ function isVisible(el: HTMLElement): boolean {
     }
 
     if (el.parentElement) {
-        return thisElementIsVisible && isVisible(el.parentElement);
+        const parentVisibility = isVisible(el.parentElement);
+        if (!parentVisibility.isVisible) {
+            message = parentVisibility.message || `hidden by: ${el.outerHTML}`
+        }
+        return {
+            isVisible: thisElementIsVisible && parentVisibility.isVisible,
+            message
+        };
     }
-    return thisElementIsVisible;
+    return {
+        isVisible: thisElementIsVisible,
+        message
+    }
 }
 
 beforeAll(() => {
@@ -252,9 +268,17 @@ beforeAll(() => {
         },
         toBeVisible(actual: HTMLElement) {
             return runAssertions(this, () => {
-                const msg = () => `Expected '${actual.outerHTML}'${notFor(this)}to be visible`;
+                let more = "";
+                const msg = () => {
+                    const pre = `Expected '${actual.outerHTML}'${notFor(this)}to be visible`;
+                    return more
+                        ? `${pre}\n${more}`
+                        : pre;
+                };
                 assert(!!actual, "actual does not exist");
-                assert(isVisible(actual), msg);
+                const result = isVisible(actual);
+                more = result.message;
+                assert(result.isVisible, msg);
                 return msg;
             });
         },
