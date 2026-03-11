@@ -2,7 +2,7 @@ import { fileExistsSync, folderExistsSync, readFileSync } from "yafs";
 import "expect-more-jest";
 import _isEqual from "lodash.isequal";
 type Mock = { mock: { calls: any[][] } };
-type CustomMatcherResult = { pass: boolean; message: () => string };
+export type CustomMatcherResult = { pass: boolean; message: () => string };
 
 export function sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
