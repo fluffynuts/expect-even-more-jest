@@ -6,14 +6,15 @@
   "files": [
     "dist/**/*",
     "jest.d.ts",
-    "vitest.d.ts"
+    "vitest.d.ts",
+    "types.d.ts"
   ],
   "scripts": {
     "pretest": "rimraf .jest-cache",
     "test": "jest --no-cache",
     "autotest": "jest -w --no-cache",
     "prebuild": "rimraf dist",
-    "build": "tsc",
+    "build": "tsc -p tsconfig.build.json",
     "lint": "tslint -p .",
     "prerelease-beta": "run-s build test",
     "release-beta": "cross-env BETA=1 VERSION_INCREMENT_STRATEGY=patch run-s \"zarro release-npm\"",

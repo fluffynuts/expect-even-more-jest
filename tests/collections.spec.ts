@@ -1,5 +1,4 @@
 // noinspection UnnecessaryLocalVariableJS
-
 import "../src/index";
 import { fakerEN as faker} from "@faker-js/faker";
 
