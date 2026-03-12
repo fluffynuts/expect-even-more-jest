@@ -71,7 +71,7 @@ export async function runAssertionsAsync(ctx: IHasIsNot, func: () => Promise<() 
 }
 
 
-function testIsInstance(actual: any, ctor: any) {
+export function testIsInstance(actual: any, ctor: any) {
     assert(actual !== undefined, "actual is undefined");
     assert(actual !== null, "actual is null");
     assert(
@@ -400,13 +400,13 @@ beforeAll(() => {
                 return err;
             });
         },
-        toBeA(actual, ctor) {
+        toBeA(actual: any, ctor: any) {
             return runAssertions(this, () => {
                 testIsInstance(actual, ctor);
                 return () => `expected${notFor(this)}to get instance of ${ctor}, but received ${actual}`;
             });
         },
-        toBeAn(actual, ctor) {
+        toBeAn(actual: any, ctor: any) {
             return runAssertions(this, () => {
                 testIsInstance(actual, ctor);
                 return () => `expected${notFor(this)}to get instance of ${ctor}, but received ${actual}`;
