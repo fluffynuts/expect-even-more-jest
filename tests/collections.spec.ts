@@ -144,7 +144,7 @@ describe(`collections`, () => {
             // Arrange
             const a: number[] = [];
             // Act
-            expect(() => expect(a).toAllMatch(i => i > 0))
+            expect(() => expect(a).toAllMatch((i: number) => i > 0))
                 .toThrow();
             // Assert
         });
@@ -154,7 +154,7 @@ describe(`collections`, () => {
                 b = [ 4, 5, 6 ];
             // Act
             expect(b)
-                .not.toAllMatch(i => i < 6);
+                .not.toAllMatch((i: number) => i < 6);
             // Assert
         });
         it(`should pass if all elements match`, async () => {
@@ -163,7 +163,7 @@ describe(`collections`, () => {
                 a = [ 1, 2, 3 ];
             // Act
             expect(a)
-                .toAllMatch(i => i < 4);
+                .toAllMatch((i: number) => i < 4);
             // Assert
         });
     });

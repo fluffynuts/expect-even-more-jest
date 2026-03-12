@@ -34,7 +34,10 @@ export interface IHasIsNot {
     isNot: boolean;
 }
 
-export function runAssertions(ctx: IHasIsNot, func: () => string | (() => string)): CustomMatcherResult {
+export function runAssertions(
+    ctx: IHasIsNot,
+    func: () => string | (() => string)
+): CustomMatcherResult {
     try {
         const message = func() || "";
         return {
@@ -258,7 +261,7 @@ beforeAll(() => {
                 return `Expected not to find anything matching\n${prettyPrint(other)}\nbut found:\n${prettyPrint(found)}`;
             });
         },
-        toAllMatch(actual: any, condition: Condition) {
+        toAllMatch(actual: any[], condition: Condition) {
             return runAssertions(this, () => {
                 const die = (m: string) => {
                     throw new Error(`toAllMatch: ${m}`);
