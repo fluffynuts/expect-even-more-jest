@@ -549,7 +549,7 @@ If this is by design, rather use 'toHaveBeenCalledOnceWithNoArgs()'.`.trim()
                     case Match.byFn:
                         const fn = myArgs[1];
                         assert(!!fn, "matcher function not supplied");
-                        const result = fn(mostRecent);
+                        const result = fn(...mostRecent);
                         if (result === false) {
                             throw new Error(
                                 `expected${notFor(this)}to have been called with args matching:\n${fn}`

@@ -604,15 +604,54 @@ describe(`mocks and spies`, () => {
                             expect(obj.fn)
                                 .toHaveBeenMostRecentlyCalledWith(
                                     Match.byFn,
-                                    (args: any[]) => {
-                                        expect(args[0])
+                                    (_i: number, _s: string, _b: boolean, _o: { foo: string }) => {
+                                        expect(_i)
                                             .toEqual(i);
-                                        expect(args[1])
+                                        expect(_s)
                                             .toEqual(s);
-                                        expect(args[2])
+                                        expect(_b)
                                             .toEqual(b);
-                                        expect(args[3].foo)
+                                        expect(_o)
+                                            .toExist();
+                                        expect(_o.foo)
                                             .toEqual("bar");
+                                    }
+                                );
+                        }).not.toThrow();
+                    });
+                    it(`should pass for true boolean response`, async () => {
+                        // Arrange
+                        const
+                            i = faker.random.number(),
+                            s = faker.random.word(),
+                            b = faker.random.boolean(),
+                            o = {
+                                foo: "bar"
+                            },
+                            obj = {
+                                fn(
+                                    _first: number,
+                                    _second: string,
+                                    _third: boolean,
+                                    _fourth: any
+                                ) {
+                                    // intentionally left blank
+                                }
+                            };
+                        spyOn(obj, "fn");
+                        // Act
+                        obj.fn(i, s, b, o);
+                        // Assert
+                        expect(() => {
+                            expect(obj.fn)
+                                .toHaveBeenMostRecentlyCalledWith(
+                                    Match.byFn,
+                                    (_i: number, _s: string, _b: boolean, _o: { foo: string }) => {
+                                        return _i === i &&
+                                            _s === s &&
+                                            _b === b &&
+                                            !!_o &&
+                                            _o.foo === "bar";
                                     }
                                 );
                         }).not.toThrow();
@@ -647,15 +686,50 @@ describe(`mocks and spies`, () => {
                             expect(obj.fn)
                                 .toHaveBeenMostRecentlyCalledWith(
                                     Match.byFn,
-                                    (...args: any[]) => {
-                                        expect(args[0])
-                                            .toEqual(i);
-                                        expect(args[1])
-                                            .toEqual(s);
-                                        expect(args[2])
-                                            .toEqual(b);
-                                        expect(args[3].foo)
-                                            .toEqual("bar");
+                                    (_i: number, _s: string, _b: boolean, _o: { foo: string }) => {
+                                        expect(_i)
+                                            .toEqual(i + 1);
+                                        expect(_s)
+                                            .toEqual(s + "-");
+                                        expect(_b)
+                                            .toEqual(!b);
+                                        expect(_o)
+                                            .toExist();
+                                        expect(_o.foo)
+                                            .toEqual("bar2");
+                                    }
+                                );
+                        }).toThrow();
+                    });
+                    it(`should fail for false boolean response`, async () => {
+                        // Arrange
+                        const
+                            i = faker.random.number(),
+                            s = faker.random.word(),
+                            b = faker.random.boolean(),
+                            o = {
+                                foo: "bar"
+                            },
+                            obj = {
+                                fn(
+                                    _first: number,
+                                    _second: string,
+                                    _third: boolean,
+                                    _fourth: any
+                                ) {
+                                    // intentionally left blank
+                                }
+                            };
+                        spyOn(obj, "fn");
+                        // Act
+                        obj.fn(i, s, b, o);
+                        // Assert
+                        expect(() => {
+                            expect(obj.fn)
+                                .toHaveBeenMostRecentlyCalledWith(
+                                    Match.byFn,
+                                    (_i: number, _s: string, _b: boolean, _o: { foo: string }) => {
+                                        return _i === i + 1;
                                     }
                                 );
                         }).toThrow();
