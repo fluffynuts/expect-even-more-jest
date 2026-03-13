@@ -19,6 +19,10 @@ declare global {
             toHaveBeenCalledOnceWith(...args: any[]): void;
             toHaveBeenCalledWith(...args: any[]): void;
             toHaveBeenCalledOnceWithNoArgs(): void;
+            toHaveBeenMostRecentlyCalledWith(...args: [ typeof Match.byFn, (...a: any[]) => boolean | void ]): void;
+            toHaveBeenMostRecentlyCalledWith(...args: [ typeof Match.byArgs, ...any[] ]): void;
+            toHaveBeenMostRecentlyCalledWith(...args: [ typeof Match.byArgs | typeof Match.byFn, ...any[] ]): void;
+            toHaveBeenMostRecentlyCalledWith(...args: [ any, ...any[] ]): void;
 
             // promises
             toBeCompleted(): Promise<void>;
@@ -49,24 +53,24 @@ declare global {
         }
 
         interface Expect {
-          toBePromiseLike(): any;
-          toBeConstructor(): any;
-          toBeA(constructor: any);
-          toBeAn(constructor: any);
-          toExist(): any;
-          toIntersectionEqual(other: object): void;
-          toBeError(withMessage?: string | RegExp): void;
-          toBeEmptyOrWhitespace(): void;
-          toBeEquivalentTo<T>(other: T[]): void;
-          toHaveKey(key: string): void;
-          toHaveKeys(key1: string, ...keys: string[]): void;
-          toAllMatch(fn: Condition): void;
-          toContainElementLike(other: any): void;
-          toHaveAttribute(attrib: string, expected?: string): void;
-          toBeVisible(): void;
-          toBeDisabled(): void;
-          toThrowMatching(matcher: (e: string | Error) => boolean): void;
-          toHaveData<T extends object>(expected: T): void;
+            toBePromiseLike(): any;
+            toBeConstructor(): any;
+            toBeA(constructor: any);
+            toBeAn(constructor: any);
+            toExist(): any;
+            toIntersectionEqual(other: object): void;
+            toBeError(withMessage?: string | RegExp): void;
+            toBeEmptyOrWhitespace(): void;
+            toBeEquivalentTo<T>(other: T[]): void;
+            toHaveKey(key: string): void;
+            toHaveKeys(key1: string, ...keys: string[]): void;
+            toAllMatch(fn: Condition): void;
+            toContainElementLike(other: any): void;
+            toHaveAttribute(attrib: string, expected?: string): void;
+            toBeVisible(): void;
+            toBeDisabled(): void;
+            toThrowMatching(matcher: (e: string | Error) => boolean): void;
+            toHaveData<T extends object>(expected: T): void;
         }
     }
 }

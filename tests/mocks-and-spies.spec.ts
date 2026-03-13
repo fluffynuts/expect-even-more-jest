@@ -1,5 +1,6 @@
 import "../src/index";
 import faker from "faker";
+import { Match } from "../src";
 
 describe(`mocks and spies`, () => {
     describe(`toHaveBeenCalledOnce`, () => {
@@ -421,6 +422,244 @@ describe(`mocks and spies`, () => {
                     expect(() => expect(mock)
                         .not.toHaveBeenCalledOnceWithNoArgs()
                     ).not.toThrow();
+                });
+            });
+        });
+    });
+
+    describe(`toHaveBeenCalledMostRecentlyWith`, () => {
+        describe(`given arbitrary args`, () => {
+            describe(`when most recent call matched`, () => {
+                it(`should pass`, async () => {
+                    // Arrange
+                    const
+                        i = faker.random.number(),
+                        s = faker.random.word(),
+                        b = faker.random.boolean(),
+                        o = {
+                            foo: "bar"
+                        },
+                        obj = {
+                            fn(
+                                _first: number,
+                                _second: string,
+                                _third: boolean,
+                                _fourth: any
+                            ) {
+                                // intentionally left blank
+                            }
+                        };
+                    spyOn(obj, "fn");
+                    // Act
+                    obj.fn(i, s, b, o);
+                    // Assert
+                    expect(() => {
+                        expect(obj.fn)
+                            .toHaveBeenMostRecentlyCalledWith(
+                                i, s, b, expect.objectContaining({
+                                    foo: "bar"
+                                })
+                            );
+                    }).not.toThrow();
+                });
+            });
+            describe(`when most recent call not matched`, () => {
+                it(`should throw`, async () => {
+                    // Arrange
+                    const
+                        i = faker.random.number(),
+                        s = faker.random.word(),
+                        b = faker.random.boolean(),
+                        o = {
+                            foo: "bar"
+                        },
+                        obj = {
+                            fn(
+                                _first: number,
+                                _second: string,
+                                _third: boolean,
+                                _fourth: any
+                            ) {
+                                // intentionally left blank
+                            }
+                        };
+                    spyOn(obj, "fn");
+                    // Act
+                    obj.fn(i, s, b, o);
+                    // Assert
+
+                    expect(() => {
+                        expect(obj.fn)
+                            .toHaveBeenMostRecentlyCalledWith(
+                                i + 1,
+                                s + "foo",
+                                !b,
+                                expect.anything()
+                            )
+                    }).toThrow();
+                });
+            });
+        });
+        describe(`explicitly told to match by args`, () => {
+            describe(`when most recent call matched`, () => {
+                it(`should pass`, async () => {
+                    // Arrange
+                    const
+                        i = faker.random.number(),
+                        s = faker.random.word(),
+                        b = faker.random.boolean(),
+                        o = {
+                            foo: "bar"
+                        },
+                        obj = {
+                            fn(
+                                _first: number,
+                                _second: string,
+                                _third: boolean,
+                                _fourth: any
+                            ) {
+                                // intentionally left blank
+                            }
+                        };
+                    spyOn(obj, "fn");
+                    // Act
+                    obj.fn(i, s, b, o);
+                    // Assert
+                    expect(() => {
+                        expect(obj.fn)
+                            .toHaveBeenMostRecentlyCalledWith(
+                                Match.byArgs,
+                                i, s, b, expect.objectContaining({
+                                    foo: "bar"
+                                })
+                            );
+                    }).not.toThrow();
+                });
+            });
+
+            describe(`when most recent call not matched`, () => {
+                it(`should throw`, async () => {
+                    // Arrange
+                    const
+                        i = faker.random.number(),
+                        s = faker.random.word(),
+                        b = faker.random.boolean(),
+                        o = {
+                            foo: "bar"
+                        },
+                        obj = {
+                            fn(
+                                _first: number,
+                                _second: string,
+                                _third: boolean,
+                                _fourth: any
+                            ) {
+                                // intentionally left blank
+                            }
+                        };
+                    spyOn(obj, "fn");
+                    // Act
+                    obj.fn(i, s, b, o);
+                    // Assert
+
+                    expect(() => {
+                        expect(obj.fn)
+                            .toHaveBeenMostRecentlyCalledWith(
+                                Match.byArgs,
+                                i + 1,
+                                s + "foo",
+                                !b,
+                                expect.anything()
+                            )
+                    }).toThrow();
+                });
+            });
+
+            describe(`when explicitly told to match by function matcher`, () => {
+                describe(`when args match`, () => {
+                    it(`should pass`, async () => {
+                        // Arrange
+                        const
+                            i = faker.random.number(),
+                            s = faker.random.word(),
+                            b = faker.random.boolean(),
+                            o = {
+                                foo: "bar"
+                            },
+                            obj = {
+                                fn(
+                                    _first: number,
+                                    _second: string,
+                                    _third: boolean,
+                                    _fourth: any
+                                ) {
+                                    // intentionally left blank
+                                }
+                            };
+                        spyOn(obj, "fn");
+                        // Act
+                        obj.fn(i, s, b, o);
+                        // Assert
+                        expect(() => {
+                            expect(obj.fn)
+                                .toHaveBeenMostRecentlyCalledWith(
+                                    Match.byFn,
+                                    (args: any[]) => {
+                                        expect(args[0])
+                                            .toEqual(i);
+                                        expect(args[1])
+                                            .toEqual(s);
+                                        expect(args[2])
+                                            .toEqual(b);
+                                        expect(args[3].foo)
+                                            .toEqual("bar");
+                                    }
+                                );
+                        }).not.toThrow();
+                    });
+                });
+
+                describe(`when args mismatch`, () => {
+                    it(`should fail`, async () => {
+                        // Arrange
+                        const
+                            i = faker.random.number(),
+                            s = faker.random.word(),
+                            b = faker.random.boolean(),
+                            o = {
+                                foo: "bar"
+                            },
+                            obj = {
+                                fn(
+                                    _first: number,
+                                    _second: string,
+                                    _third: boolean,
+                                    _fourth: any
+                                ) {
+                                    // intentionally left blank
+                                }
+                            };
+                        spyOn(obj, "fn");
+                        // Act
+                        obj.fn(i, s, b, o);
+                        // Assert
+                        expect(() => {
+                            expect(obj.fn)
+                                .toHaveBeenMostRecentlyCalledWith(
+                                    Match.byFn,
+                                    (...args: any[]) => {
+                                        expect(args[0])
+                                            .toEqual(i);
+                                        expect(args[1])
+                                            .toEqual(s);
+                                        expect(args[2])
+                                            .toEqual(b);
+                                        expect(args[3].foo)
+                                            .toEqual("bar");
+                                    }
+                                );
+                        }).toThrow();
+                    });
                 });
             });
         });

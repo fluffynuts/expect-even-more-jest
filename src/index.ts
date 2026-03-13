@@ -1,11 +1,17 @@
 import { fileExistsSync, folderExistsSync, readFileSync } from "yafs";
 import "expect-more-jest";
 import _isEqual from "lodash.isequal";
+
 type Mock = { mock: { calls: any[][] } };
 export type CustomMatcherResult = { pass: boolean; message: () => string };
 
 export function sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+export const Match = {
+    byArgs: Symbol("byArgs"),
+    byFn: Symbol("byFn")
 }
 
 export type Nullable<T> = (T | null);
@@ -50,6 +56,30 @@ export function runAssertions(
             message: () => resolveErrorMessage(e)
         };
     }
+}
+
+function findArgsMatches(
+    actual: any[][],
+    expected: any[]
+): any[][] {
+    return actual.filter(
+        received => {
+            try {
+                expect(received.length)
+                    .toEqual(expected.length);
+                expected.forEach((r: any, idx: number) => {
+                    const test = received[idx];
+                    if (typeof test === "string" && r instanceof RegExp) {
+                        expect(test).toMatch(r);
+                    } else {
+                        expect(test).toEqual(r);
+                    }
+                });
+                return true;
+            } catch (e) {
+                return false;
+            }
+        });
 }
 
 function resolveErrorMessage(e: unknown): string {
@@ -480,24 +510,7 @@ If this is by design, rather use 'toHaveBeenCalledOnceWithNoArgs()'.`.trim()
                     );
                 }
                 const receivedArgs = fetchSpyOrMockArgs(actual);
-                const matching = receivedArgs.filter(
-                    received => {
-                        try {
-                            expect(received.length)
-                                .toEqual(args.length);
-                            received.forEach((r: any, idx: number) => {
-                                const test = args[idx];
-                                if (typeof r === "string" && test instanceof RegExp) {
-                                    expect(r).toMatch(test);
-                                } else {
-                                    expect(r).toEqual(test);
-                                }
-                            });
-                            return true;
-                        } catch (e) {
-                            return false;
-                        }
-                    });
+                const matching = findArgsMatches(receivedArgs, args);
                 assert(
                     matching.length === 1,
                     `expected${notFor(this)}to have found exactly one matching call, but found ${matching.length}\n${debugReceived(
@@ -510,6 +523,54 @@ If this is by design, rather use 'toHaveBeenCalledOnceWithNoArgs()'.`.trim()
                     receivedArgs
                 )}`;
             });
+        },
+        toHaveBeenMostRecentlyCalledWith(actual: Mock | jasmine.Spy, ...args: [ any, ...any[] ]) {
+            return runAssertions(this, () => {
+                const receivedArgs = fetchSpyOrMockArgs(actual);
+                assert(receivedArgs.length > 0, "mock was not called");
+                const
+                    myArgs = preformatMostRecentCalledWithArgs(),
+                    mostRecent = receivedArgs[receivedArgs.length - 1]!;
+                switch (myArgs[0]) {
+                    case Match.byArgs:
+                        const argsToMatch = myArgs.slice(1);
+                        const matches = findArgsMatches(
+                            [ mostRecent ],
+                            argsToMatch
+                        );
+                        assert(
+                            matches.length === 1,
+                            `expected${notFor(this)}to have most recent call with args: ${argsToMatch}\n${debugReceived(
+                                argsToMatch,
+                                [ mostRecent ]
+                            )}`
+                        );
+                        break;
+                    case Match.byFn:
+                        const fn = myArgs[1];
+                        assert(!!fn, "matcher function not supplied");
+                        const result = fn(mostRecent);
+                        if (result === false) {
+                            throw new Error(
+                                `expected${notFor(this)}to have been called with args matching:\n${fn}`
+                            );
+                        }
+                        break;
+                    default:
+                        throw new Error("first argument is not a Match value - should have been added for you if not present");
+                }
+                return () => `expected${notFor(this)}to have been most recently called with ${myArgs}\n${debugReceived(
+                    myArgs,
+                    receivedArgs
+                )}`
+            });
+
+            function preformatMostRecentCalledWithArgs(): any[] {
+                if (args[0] === Match.byArgs || args[0] === Match.byFn) {
+                    return args; // already has the type inserted
+                }
+                return [ Match.byArgs, ...args ];
+            }
         },
         async toBeCompleted(actual: Promise<any>) {
             return runAssertionsAsync(this, async () => {
@@ -673,7 +734,7 @@ export function isJestMock(a: any) {
 }
 
 // NB: this is useful from other modules; leave it exported!
-export function fetchSpyOrMockArgs(subject: Mock | jasmine.Spy | Function): any[] {
+export function fetchSpyOrMockArgs(subject: Mock | jasmine.Spy | Function): any[][] {
     // jasmine spies come from doing `spyOn(thing, "method")`
     // jest mocks come from `jest.fn()`
     if (isJasmineSpy(subject)) {

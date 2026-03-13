@@ -14,6 +14,10 @@ declare module "vitest" {
         toHaveBeenCalledOnceWith(...args: any[]): void;
         toHaveBeenCalledWith(...args: any[]): void;
         toHaveBeenCalledOnceWithNoArgs(): void;
+        toHaveBeenMostRecentlyCalledWith(...args: [ typeof Match.byFn, (...a: any[]) => boolean | void ]): void;
+        toHaveBeenMostRecentlyCalledWith(...args: [ typeof Match.byArgs, ...any[] ]): void;
+        toHaveBeenMostRecentlyCalledWith(...args: [ typeof Match.byArgs | typeof Match.byFn, ...any[] ]): void;
+        toHaveBeenMostRecentlyCalledWith(...args: [ any, ...any[] ]): void;
         toBeCompleted(): Promise<void>;
         toBeResolved(message?: string, timeout?: number): Promise<void>;
         toBeRejected(message?: string, timeout?: number): Promise<void>;
