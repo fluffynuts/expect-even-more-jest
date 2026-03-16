@@ -695,6 +695,43 @@ If this is by design, rather use 'toHaveBeenCalledOnceWithNoArgs()'.`.trim()
                     return msg;
                 }
             });
+        },
+        toHaveQueryParameter(
+            actual: string,
+            key: string,
+            expected: string | RegExp | ((s: string) => boolean)
+        ) {
+            return runAssertions(this, () => {
+                assert(!!actual, "actual is empty, null, undefined, or zero");
+                let url: URL;
+                try {
+                    url = new URL(actual);
+                } catch (e) {
+                    return () => `'${actual}' is not a valid url`;
+                }
+                const actualValue = url.searchParams.get(key);
+                assert(actualValue !== null, `expected${notFor(this)}to find query parameter '${key}'`);
+                if (typeof expected === "string") {
+                    assert(
+                        actualValue === expected,
+                        `expected${notFor(this)}to have query parameter '${key}' with value '${expected}', but found '${actualValue}'`
+                    );
+                } else if (typeof expected === "function") {
+                    const userResult = expected(actualValue!);
+                    assert(
+                        userResult,
+                        `expected query param '${key}'${notFor(this)}to be matched by custom function. Actual value is '${actualValue}'\nmatcher function:\n${expected}`
+                    )
+                } else if (expected instanceof RegExp) {
+                    assert(
+                        !!actualValue?.match(expected),
+                        `expected${notFor(this)}to match regex: ${expected}. Actual value is '${actualValue}'`
+                    );
+                } else {
+                    return () => `unable to use '${expected}' to verify query param - accepted inputs are string, (s: string) => boolean, or RegExp`;
+                }
+                return () => `expected '${actual}'${notFor(this)}to have query parameter '${key}' matched by '${expected}'`;
+            });
         }
     });
 });

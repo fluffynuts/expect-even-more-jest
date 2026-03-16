@@ -50,6 +50,7 @@ declare global {
             toThrowMatching(matcher: (e: string | Error) => boolean): void;
             // data-matching
             toHaveData<T extends object>(expected: T): void;
+            toHaveQueryParameter(key: string, value: string | RegExp | ((s: string) => boolean)): void;
         }
 
         interface Expect {

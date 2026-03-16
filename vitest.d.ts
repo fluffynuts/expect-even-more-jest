@@ -34,6 +34,7 @@ declare module "vitest" {
         toBeDisabled(): void;
         toThrowMatching(matcher: (e: string | Error) => boolean): void;
         toHaveData<T extends object>(expected: T): void;
+        toHaveQueryParameter(key: string, value: string | RegExp | ((s: string) => boolean)): void;
     }
 
     interface AsymmetricMatchersContaining {

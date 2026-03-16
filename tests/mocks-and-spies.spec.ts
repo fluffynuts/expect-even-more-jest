@@ -739,6 +739,87 @@ describe(`mocks and spies`, () => {
         });
     });
 
+    describe(`toHaveQueryStringParameter`, () => {
+        describe(`operating on string`, () => {
+            it(`should pass when parameter matched`, async () => {
+                // Arrange
+                const url = "https://some.host/some/path?key1=value1&key2=value2";
+                // Act
+                expect(() => {
+                    expect(url)
+                        .toHaveQueryParameter("key1", "value1");
+                    expect(url)
+                        .toHaveQueryParameter("key2", "value2");
+                }).not.toThrow();
+                // Assert
+            });
+            it(`should fail when parameter mismatched`, async () => {
+                // Arrange
+                const url = "https://some.host/some/path?key1=value1&key2=value2";
+                // Act
+                expect(() => {
+                    expect(url)
+                        .toHaveQueryParameter("key1", "value2");
+                }).toThrow();
+                // Assert
+            });
+        });
+
+        describe(`operating on regex`, () => {
+            it(`should pass when parameter matched`, async () => {
+                // Arrange
+                const url = "https://some.host/some/path?key1=value1&key2=value2";
+                // Act
+                expect(() => {
+                    expect(url)
+                        .toHaveQueryParameter("key1", /value/);
+                    expect(url)
+                        .toHaveQueryParameter("key1", /value1/);
+                    expect(url)
+                        .toHaveQueryParameter("key2", /value2/);
+                }).not.toThrow();
+                // Assert
+            });
+            it(`should fail when parameter mismatched`, async () => {
+                // Arrange
+                const url = "https://some.host/some/path?key1=value1&key2=value2";
+                // Act
+                expect(() => {
+                    expect(url)
+                        .toHaveQueryParameter("key1", /2/);
+                }).toThrow();
+                // Assert
+            });
+        });
+
+        describe(`operating on matcher function`, () => {
+            it(`should pass when parameter matched`, async () => {
+                // Arrange
+                const url = "https://some.host/some/path?key1=value1&key2=value2";
+                // Act
+                expect(() => {
+                    expect(url)
+                        .toHaveQueryParameter("key1", s => s.startsWith("value"));
+                    expect(url)
+                        .toHaveQueryParameter("key1", s => s.endsWith("1"));
+                    expect(url)
+                        .toHaveQueryParameter("key2", s => s === "value2");
+                }).not.toThrow();
+                // Assert
+            });
+            it(`should fail when parameter mismatched`, async () => {
+                // Arrange
+                const url = "https://some.host/some/path?key1=value1&key2=value2";
+                // Act
+                expect(() => {
+                    expect(url)
+                        .toHaveQueryParameter("key1", s => s.includes("2"));
+                }).toThrow();
+                // Assert
+            });
+        });
+    });
+
     describe(`wild issues`, () => {
         it(`should be able to print for jasmine.any(Function)`, async () => {
             // Arrange
