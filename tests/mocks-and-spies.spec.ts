@@ -1,6 +1,7 @@
 import "../src/index";
 import faker from "faker";
 import { Match } from "../src";
+import createSpy = jasmine.createSpy;
 
 describe(`mocks and spies`, () => {
     describe(`toHaveBeenCalledOnce`, () => {
@@ -736,6 +737,51 @@ describe(`mocks and spies`, () => {
                     });
                 });
             });
+        });
+    });
+
+    describe("toHaveBeenCalledWith", () => {
+        it("should pass on single matched call", async () => {
+            // Arrange
+            const fn = createSpy();
+            // Act
+            fn("foo");
+            // Assert
+            expect(fn)
+                .toHaveBeenCalledWith("foo");
+        });
+        it("should fail when no calls", async () => {
+            // Arrange
+            const fn = createSpy();
+            // Act
+            expect(() =>
+                expect(fn)
+                    .toHaveBeenCalledWith("foo")
+            ).toThrow();
+            // Assert
+        });
+        it("positive: should pass when any call matches", async () => {
+            // Arrange
+            const fn = createSpy();
+            // Act
+            fn("foo");
+            fn("bar");
+            fn("quux");
+            // Assert
+            expect(fn)
+                .toHaveBeenCalledWith("bar");
+        });
+        it("negative: should pass when the excluded call is not present", async () => {
+            // Arrange
+            const fn = createSpy();
+            // Act
+            fn("foo");
+            fn("bar");
+            // Assert
+            expect(() =>
+                expect(fn)
+                    .not.toHaveBeenCalledWith("quuz")
+            ).not.toThrow();
         });
     });
 
