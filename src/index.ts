@@ -368,7 +368,7 @@ beforeAll(() => {
                 );
                 assert(actual.reduce(
                     (acc, cur) =>
-                        acc && expected.indexOf(cur) > -1,
+                        acc && !!expected.find(o => areEqual(o, cur)),
                     true
                 ), msg);
                 return msg;

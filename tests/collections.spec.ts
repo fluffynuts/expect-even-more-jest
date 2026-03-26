@@ -36,6 +36,31 @@ describe(`collections`, () => {
                 .not.toBeEquivalentTo(different);
             // Assert
         });
+
+        it("should pass for equivalent object collections", async () => {
+            // Arrange
+            const
+                o1 = { foo: 1, bar: "2" },
+                o2 = { foo: 2, bar: "3" },
+                left = [ o1, o2 ],
+                right = [ o2, o1 ];
+            // Act
+            expect(left)
+                .toBeEquivalentTo(right);
+            // Assert
+        });
+        it("should pass for equivalent object collections (one is proxied)", async () => {
+            // Arrange
+            const
+                o1 = { foo: 1, bar: "2" },
+                o2 = { foo: 2, bar: "3" },
+                left = [ o1, o2 ],
+                right = [ new Proxy(o2, {}), new Proxy(o1, {}) ];
+            // Act
+            expect(left)
+                .toBeEquivalentTo(right);
+            // Assert
+        });
     });
     describe(`toHaveKey`, () => {
         it(`should fail when object does not exist`, async () => {
