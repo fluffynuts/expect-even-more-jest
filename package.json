@@ -6,8 +6,7 @@
   "files": [
     "dist/**/*",
     "jest.d.ts",
-    "vitest.d.ts",
-    "types.d.ts"
+    "vitest.d.ts"
   ],
   "scripts": {
     "pretest": "rimraf .jest-cache",
