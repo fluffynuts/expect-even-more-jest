@@ -1,12 +1,13 @@
 {
   "name": "expect-even-more-jest",
-  "version": "1.29.2",
+  "version": "1.29.3",
   "description": "expect-more-jest with even more stuff",
   "main": "dist/index.js",
   "files": [
     "dist/**/*",
     "jest.d.ts",
-    "vitest.d.ts"
+    "vitest.d.ts",
+    "index.d.ts"
   ],
   "types": "./index.d.st",
   "scripts": {
