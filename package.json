@@ -8,6 +8,14 @@
     "jest.d.ts",
     "vitest.d.ts"
   ],
+  "exports": {
+    ".": {
+      "types@jest": "./jest.d.ts",
+      "types@vitest": "./vitest.d.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
   "scripts": {
     "pretest": "rimraf .jest-cache",
     "test": "jest --no-cache",

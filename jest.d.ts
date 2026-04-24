@@ -1,4 +1,4 @@
-import { Condition } from "./index";
+import type { Condition, Match } from "./dist/index";
 
 declare global {
     namespace jest {
