@@ -1,4 +1,4 @@
-import type { Condition, Match } from "./dist/index";
+import { type Condition, Match } from "./dist/index";
 
 declare module "vitest" {
     interface Assertion<T = any> {

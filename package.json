@@ -1,6 +1,6 @@
 {
   "name": "expect-even-more-jest",
-  "version": "1.29.1",
+  "version": "1.29.2",
   "description": "expect-more-jest with even more stuff",
   "main": "dist/index.js",
   "files": [
@@ -8,14 +8,7 @@
     "jest.d.ts",
     "vitest.d.ts"
   ],
-  "exports": {
-    ".": {
-      "types@jest": "./jest.d.ts",
-      "types@vitest": "./vitest.d.ts",
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    }
-  },
+  "types": "./index.d.st",
   "scripts": {
     "pretest": "rimraf .jest-cache",
     "test": "jest --no-cache",
