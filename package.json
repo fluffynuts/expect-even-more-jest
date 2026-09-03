@@ -35,7 +35,7 @@
   },
   "homepage": "https://github.com/fluffynuts/expect-even-more-jest#readme",
   "devDependencies": {
-    "@faker-js/faker": "^9.9.0",
+    "@faker-js/faker": "^10.5.0",
     "@types/faker": "^4.1.12",
     "@types/jest": "^25.2.3",
     "@types/lodash": "^4.14.153",
