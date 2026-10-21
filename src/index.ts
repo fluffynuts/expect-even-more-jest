@@ -685,14 +685,19 @@ If this is by design, rather use 'toHaveBeenCalledOnceWithNoArgs()'.`.trim()
     },
     toThrowMatching(actual: () => void, matcher: (e: string | Error) => boolean) {
         return runAssertions(this, () => {
+            let
+                thrown: unknown,
+                didThrow = false;
             try {
                 actual();
-                return () => `Expected function to throw an error, but none was thrown`;
             } catch (e) {
-                const msg = () => `Expected function to throw error matching ${matcher}\ninstead, it threw: ${e}`;
-                assert(matcher(e as Error), msg);
-                return msg;
+                thrown = e;
+                didThrow = true;
             }
+            assert(didThrow, `Expected function to throw an error, but none was thrown`);
+            const msg = () => `Expected function to throw error matching ${matcher}\ninstead, it threw: ${thrown}`;
+            assert(matcher(thrown as Error), msg);
+            return msg;
         });
     },
     toHaveQueryParameter(

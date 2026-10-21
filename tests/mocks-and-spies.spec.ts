@@ -941,17 +941,33 @@ describe(`mocks and spies`, () => {
                         e.message.indexOf("bar") > -1
                 );
             }).toThrow();
-
-            expect(() => {
-                expect(() => {
-                    return 10;
-                }).not.toThrowMatching(
-                    e => e instanceof Error &&
-                        e.message.indexOf("foo") > -1 &&
-                        e.message.indexOf("bar") > -1
-                );
-            }).toThrow();
             // Assert
+        });
+
+        describe(`when the function does not throw`, () => {
+            it(`should fail`, async () => {
+                // Arrange
+                // Act
+                expect(() => {
+                    expect(() => {
+                        return 10;
+                    }).toThrowMatching(() => true);
+                }).toThrow("none was thrown");
+                // Assert
+            });
+
+            describe(`and negated`, () => {
+                it(`should pass`, async () => {
+                    // Arrange
+                    // Act
+                    expect(() => {
+                        expect(() => {
+                            return 10;
+                        }).not.toThrowMatching(() => true);
+                    }).not.toThrow();
+                    // Assert
+                });
+            });
         });
     })
     ;
